@@ -1,0 +1,13 @@
+untuk backend
+    1. masul ke backend
+    2.  npm install -g @nestjs/cli
+    3. nest ---version (untuk cek apakah sudah terinstall)
+    4. nest new . --language ts
+        (pakai npm saja)
+
+
+untuk forntend
+    1.  npm create vite@latest . -- --template react-ts
+    2. typescript + swc
+    3. npm install 
+    4. npm run dev (untuk runnning)

@@ -1,0 +1,143 @@
+src/
+└── components/
+    ├── Navbar.js
+    ├── Sidebar.js
+    ├── ProtectedRoute.js
+    ├── RoleRoute.js
+    ├── FormInput.js
+    ├── FormSelect.js
+    ├── Table.js
+    ├── Loading.js
+    ├── SuccessAlert.js
+    ├── ErrorAlert.js
+    ├── ConfirmDialog.js
+
+Dashboard.js – Halaman awal link ke website
+Home.js – landing page setelah login
+NotFound.js – fallback 404
+logout.js 
+profile.js profile user
+
+Auth/
+├── Login.js
+├── Register.js
+
+SPBU/
+├── SPBUList.js
+├── AddSPBU.js	
+├── EditSPBU.js
+├── SPBUForm.js
+
+AgenLPG/
+├── AgenList.js
+├── AddAgen.js
+├── EditAgen.js
+├── AgenForm.js
+
+PangkalanLPG/
+├── PangkalanList.js
+├── AddPangkalan.js
+├── EditPangkalan.js
+├── PangkalanForm.js
+
+SPBE/
+├── SPBEList.js
+├── AddSPBE.js
+├── EditSPBE.js
+├── SPBEForm.js
+
+JenisBBM/
+├── JenisList.js
+├── AddJenis.js
+├── EditJenis.js
+├── JenisForm.js
+
+RealisasiTabung/
+├── HeaderTabungList.js
+├── AddHeaderTabung.js
+├── EditHeaderTabung.js
+├── HeaderTabungForm.js
+
+├── BulananTabungList.js
+├── AddBulananTabung.js
+├── EditBulananTabung.js
+├── BulananTabungForm.js
+
+--------------------baru sampai sini-------------------- 
+
+RealisasiBBM/
+├── HeaderBBMList.js
+├── AddHeaderBBM.js
+├── EditHeaderBBM.js
+├── HeaderBBMForm.js
+
+├── DetailBBMList.js
+├── AddDetailBBM.js
+├── EditDetailBBM.js
+├── DetailBBMForm.js
+
+Pasar/
+├── PasarList.js
+├── AddPasar.js
+├── EditPasar.js
+├── PasarForm.js
+
+SatuanBarang/
+├── SatuanList.js
+├── AddSatuan.js
+├── EditSatuan.js
+├── SatuanForm.js
+
+NamaBarang/
+├── BarangList.js
+├── AddBarang.js
+├── EditBarang.js
+├── BarangForm.js
+
+BarangPasar/
+├── RelasiList.js
+├── AddRelasi.js
+├── EditRelasi.js
+├── RelasiForm.js
+
+HargaBarangPasar/
+├── HargaList.js
+├── AddHarga.js
+├── EditHarga.js
+├── HargaForm.js
+
+StokPangan/
+├── DistributorList.js
+├── AddDistributor.js
+├── EditDistributor.js
+├── DistributorForm.js
+
+KomoditasStok/
+├── KomoditasList.js
+├── AddKomoditas.js
+├── EditKomoditas.js
+├── KomoditasForm.js
+
+TransaksiStokPangan/
+├── TransaksiList.js
+├── AddTransaksi.js
+├── EditTransaksi.js
+├── TransaksiForm.js
+
+ExportImport/
+├── PerusahaanList.js
+├── AddPerusahaan.js
+├── EditPerusahaan.js
+├── PerusahaanForm.js
+
+Ekspor/
+├── EksporList.js
+├── AddEkspor.js
+├── EditEkspor.js
+├── EksporForm.js
+
+Impor/
+├── ImporList.js
+├── AddImpor.js
+├── EditImpor.js
+├── ImporForm.js

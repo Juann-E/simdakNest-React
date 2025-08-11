@@ -1,0 +1,36 @@
+
+untuk push 
+    git push -u origin master
+    ke branch utamaa
+
+    git add. 
+    git commit -m ""
+    git push -u origin master
+
+
+ini yang di ganti
+
+13
+14
+15
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
