@@ -19,7 +19,7 @@ nama barang
     time stamp
 
 barang pasar grid
-    (memanggil data dari tale nama pasar untuk memunculkan semua)
+    (memanggil data dari table nama pasar untuk memunculkan semua)
 dalaman barang pasar grid
     id barang pasar (pk)
     id pasar (fk)

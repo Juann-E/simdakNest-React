@@ -1,0 +1,33 @@
+src/
+│
+├── auth/
+│   ├── auth.controller.ts
+│   ├── auth.module.ts
+│   ├── auth.service.ts
+│   ├── jwt.strategy.ts
+│   ├── jwt-auth.guard.ts
+│   └── roles.guard.ts        # Guard untuk peran (admin/operator)
+│
+├── common/
+│   ├── decorators/
+│   │   └── roles.decorator.ts   # Custom decorator @Roles()
+│   └── enums/
+│       └── user-role.enum.ts    # Enum role
+│
+├── modules/
+│   ├── user/
+│   │   ├── user.controller.ts
+│   │   ├── user.module.ts
+│   │   ├── user.service.ts
+│   │   └── user.entity.ts
+│   │
+│   └── nama-pasar/
+│       ├── dto/
+│       │   ├── create-nama-pasar.dto.ts
+│       │   └── update-nama-pasar.dto.ts
+│       ├── nama-pasar.controller.ts
+│       ├── nama-pasar.module.ts
+│       ├── nama-pasar.service.ts
+│       └── nama-pasar.entity.ts
+│
+└── app.module.ts
