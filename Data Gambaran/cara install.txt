@@ -4,18 +4,16 @@ untuk backend
     3. nest ---version (untuk cek apakah sudah terinstall)
     4. nest new . --language ts
         (pakai npm saja)
---- ini baru---
     5. install dependency
         npm install @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt
         npm install -D @types/passport-jwt @types/bcrypt
         npm install @nestjs/config @nestjs/typeorm typeorm mysql2
-    6. auth module
-        nest g module auth
-        nest g service auth
-        nest g controller auth
-    7. npm install @nestjs/config
-    8. npm install ts-node -D
+    6. npm install @nestjs/config
+    7. npm install ts-node -D
     9. npm install @nestjs/mapped-types
+--- ini baru --
+    10. npm install class-validator class-transformer
+
     
 untuk migrating
     1. npx ts-node src/seeds/create-admin.seed.ts

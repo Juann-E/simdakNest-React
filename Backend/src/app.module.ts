@@ -7,6 +7,7 @@ import { NamaPasarModule } from './modules/nama-pasar/nama-pasar.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { SatuanBarangModule } from './modules/satuan-barang/satuan-barang.module';
 
 @Module({
   providers: [
@@ -28,6 +29,7 @@ import { RolesGuard } from './auth/roles.guard';
     UserModule,
     AuthModule,
     NamaPasarModule,
+    SatuanBarangModule,
   ],
 })
 export class AppModule { }

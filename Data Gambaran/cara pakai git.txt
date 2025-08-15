@@ -12,6 +12,7 @@ untuk push
 
 ini yang di ganti
 git remote add origin https://github.com/Juann-E/simdakNest-React.git
- git push -u origin main
+ git push -u origin master
+    git pull origin master
 
  git yang di pakai repo ku
