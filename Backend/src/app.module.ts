@@ -3,11 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { NamaPasarModule } from './modules/nama-pasar/nama-pasar.module';
+import { NamaPasarModule } from './modules/Kepokmas/nama-pasar/nama-pasar.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
-import { SatuanBarangModule } from './modules/satuan-barang/satuan-barang.module';
+import { SatuanBarangModule } from './modules/Kepokmas/satuan-barang/satuan-barang.module';
+import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.module';
+
 
 @Module({
   providers: [
@@ -30,6 +32,7 @@ import { SatuanBarangModule } from './modules/satuan-barang/satuan-barang.module
     AuthModule,
     NamaPasarModule,
     SatuanBarangModule,
+    NamaBarangModule,
   ],
 })
 export class AppModule { }

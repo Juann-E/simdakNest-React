@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Delete, Param, UseGuards } from '@n
 import { NamaPasarService } from './nama-pasar.service';
 import { CreateNamaPasarDto } from './dto/create-nama-pasar.dto';
 import { UpdateNamaPasarDto } from './dto/update-nama-pasar.dto';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { RolesGuard } from '../../auth/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRole } from '../../../common/enums/user-role.enum';
 
 @Controller('nama-pasar')
 @UseGuards(JwtAuthGuard, RolesGuard)
