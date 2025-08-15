@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany ,JoinColumn, CreateDateColumn } from 'typeorm';
 import { SatuanBarang } from '../satuan-barang/satuan-barang.entity';
+import { BarangPasarGrid } from '../barang-pasar-grid/barang-pasar-grid.entity';
 
 @Entity('nama_barang')
 export class NamaBarang {
@@ -18,4 +19,8 @@ export class NamaBarang {
 
   @CreateDateColumn({ name: 'time_stamp' })
   createdAt: Date;
+
+  // Tambahkan relasi OneToMany ke BarangPasarGrid
+  @OneToMany(() => BarangPasarGrid, (grid) => grid.barang)
+  barangPasarGrid: BarangPasarGrid[];
 }

@@ -9,7 +9,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { SatuanBarangModule } from './modules/Kepokmas/satuan-barang/satuan-barang.module';
 import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.module';
-
+import { BarangPasarGridModule } from './modules/Kepokmas/barang-pasar-grid/barang-pasar-grid.module';
+import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/harga-barang-pasar.module';
 
 @Module({
   providers: [
@@ -20,11 +21,11 @@ import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.mod
     ConfigModule.forRoot({ isGlobal: true }), // ✅ load env
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 3306,
-      username: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-      database: process.env.DB_NAME || 'simdag_main_db',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
@@ -33,6 +34,8 @@ import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.mod
     NamaPasarModule,
     SatuanBarangModule,
     NamaBarangModule,
+    BarangPasarGridModule,
+    HargaBarangPasarModule,
   ],
 })
 export class AppModule { }

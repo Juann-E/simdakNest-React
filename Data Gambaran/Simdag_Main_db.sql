@@ -45,6 +45,7 @@ CREATE TABLE barang_pasar_grid (
     id_barang_pasar INT AUTO_INCREMENT PRIMARY KEY,
     id_pasar INT NOT NULL,
     id_barang INT NOT NULL,
+    keterangan TEXT,
     time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_pasar) REFERENCES nama_pasar(id_pasar)
         ON UPDATE CASCADE
@@ -54,16 +55,19 @@ CREATE TABLE barang_pasar_grid (
         ON DELETE CASCADE
 );
 
+
 -- Tabel harga_barang_pasar
 CREATE TABLE harga_barang_pasar (
     id_harga INT AUTO_INCREMENT PRIMARY KEY,
     id_barang_pasar INT NOT NULL,
     harga DECIMAL(15,2) NOT NULL,
+    keterangan TEXT,
     time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_barang_pasar) REFERENCES barang_pasar_grid(id_barang_pasar)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
 
 -- Optional: View untuk menghitung persentase perubahan harga H-1 vs terbaru
 CREATE VIEW view_perubahan_harga AS

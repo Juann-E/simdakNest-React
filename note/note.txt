@@ -1,0 +1,9 @@
+1. 
+    ALTER TABLE barang_pasar_grid
+    ADD COLUMN keterangan TEXT NULL AFTER id_barang;
+2. 
+    ALTER TABLE harga_barang_pasar
+    ADD COLUMN keterangan TEXT AFTER harga;
+3.  barang grid full main di body json untuk milih nya
+
+4. harag pasar grid belum bisa
