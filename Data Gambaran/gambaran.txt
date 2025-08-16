@@ -5,35 +5,38 @@ spbu lpg
     spbe
 
 kepokmas
+done{
     nama Pasar  
-        keterangan  = alamat
-        CRUD biasa
+            keterangan  = alamat
+            CRUD biasa
 
-    satuan barang 
-        tanyakan bagian keterangan 
-            keterangan bisa untuk jenis barang nya  (kertas bisa pakai lembar)
-        CRUD biasa
+        satuan barang 
+            tanyakan bagian keterangan 
+                keterangan bisa untuk jenis barang nya  (kertas bisa pakai lembar)
+            CRUD biasa
 
-    nama barang
-        satuan barang diambil dari table satuan barang
-        CRUD biasa
+        nama barang
+            satuan barang diambil dari table satuan barang
+            CRUD biasa
 
-    barang pasar grid
-        table pasar dan di isi table barang pasar
-            spesifikasi 
-                -> nama barang dari nama barang
-                -> diberikan foreignkey yang sama dengan pasar yang dituju
-                setiingan kecamatan keluarahan dan kecamatan
-        tabel pasar grid
-            table barang = per barang diberikan foreignkey pasar
-            jadi barang akan diberikan foreighkey  pasar agar barang yang dijual di pasar'
-                tidak bercampur dengan baranga yang seharusnya tidak terjual
+        barang pasar grid
+            table pasar dan di isi table barang pasar
+                spesifikasi 
+                    -> nama barang dari nama barang
+                    -> diberikan foreignkey yang sama dengan pasar yang dituju
+                    setiingan kecamatan keluarahan dan kecamatan
+            tabel pasar grid
+                table barang = per barang diberikan foreignkey pasar
+                jadi barang akan diberikan foreighkey  pasar agar barang yang dijual di pasar'
+                    tidak bercampur dengan baranga yang seharusnya tidak terjual
 
-    harga barang grid
-        dapatkan konteks harga barang default dan strategis
+        harga barang grid
+            dapatkan konteks harga barang default dan strategis
 
-            default = harga pasar (berubah rubah)
-            Buat seperti flearn
+                default = harga pasar (berubah rubah)
+                Buat seperti flearn
+}
+    
 
     report
         minta kejelasan settingan rumusan tiap repot
