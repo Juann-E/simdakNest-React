@@ -4,67 +4,56 @@ import { Repository } from 'typeorm';
 import { HargaBarangPasar } from './harga-barang-pasar.entity';
 import { CreateHargaBarangPasarDto } from './dto/create-harga-barang-pasar.dto';
 import { UpdateHargaBarangPasarDto } from './dto/update-harga-barang-pasar.dto';
-import { BarangPasarGrid } from '../barang-pasar-grid/barang-pasar-grid.entity';
 
 @Injectable()
 export class HargaBarangPasarService {
   constructor(
     @InjectRepository(HargaBarangPasar)
     private hargaRepo: Repository<HargaBarangPasar>,
-
-    @InjectRepository(BarangPasarGrid)
-    private barangPasarRepo: Repository<BarangPasarGrid>,
-  ) {}
+  ) { }
 
   async create(dto: CreateHargaBarangPasarDto) {
-    const barangPasar = await this.barangPasarRepo.findOne({ 
-      where: { id_barang_pasar: dto.idBarangPasar } 
-    });
-    if (!barangPasar) throw new NotFoundException('Barang pasar tidak ditemukan');
-
-    const harga = this.hargaRepo.create({
-      barangPasar,
-      harga: dto.harga,
-      keterangan: dto.keterangan,
-    });
-
-    return this.hargaRepo.save(harga);
+    const harga = this.hargaRepo.create(dto);
+    return await this.hargaRepo.save(harga);
   }
 
-  findAll() {
-    return this.hargaRepo.find({ 
-      relations: ['barangPasar', 'barangPasar.barang', 'barangPasar.pasar'] 
-    });
+  async filter(params: { idHarga?: number; idBarangPasar?: number }) {
+    const query = this.hargaRepo.createQueryBuilder('harga')
+      .leftJoinAndSelect('harga.barang', 'barang')
+      .leftJoinAndSelect('barang.pasar', 'pasar')
+      .leftJoinAndSelect('barang.barang', 'nama_barang');
+
+    if (params.idHarga) {
+      query.andWhere('harga.id_harga = :id_harga', { id_harga: params.idHarga });
+    }
+
+    if (params.idBarangPasar) {
+      query.andWhere('harga.id_barang_pasar = :id_barang_pasar', { id_barang_pasar: params.idBarangPasar });
+    }
+
+    return await query.getMany();
+  }
+
+
+
+  async findAll() {
+    return await this.hargaRepo.find({ relations: ['barang'] });
   }
 
   async findOne(id: number) {
-    const harga = await this.hargaRepo.findOne({ 
-      where: { id }, 
-      relations: ['barangPasar', 'barangPasar.barang', 'barangPasar.pasar'] 
-    });
-    if (!harga) throw new NotFoundException('Data harga barang pasar tidak ditemukan');
-    return harga;
+    const data = await this.hargaRepo.findOne({ where: { id_harga: id }, relations: ['barang'] });
+    if (!data) throw new NotFoundException(`Data dengan ID ${id} tidak ditemukan`);
+    return data;
   }
 
   async update(id: number, dto: UpdateHargaBarangPasarDto) {
-    const harga = await this.findOne(id);
-
-    if (dto.idBarangPasar) {
-      const barangPasar = await this.barangPasarRepo.findOne({ 
-        where: { id_barang_pasar: dto.idBarangPasar } 
-      });
-      if (!barangPasar) throw new NotFoundException('Barang pasar tidak ditemukan');
-      harga.barangPasar = barangPasar;
-    }
-
-    if (dto.harga !== undefined) harga.harga = dto.harga;
-    if (dto.keterangan !== undefined) harga.keterangan = dto.keterangan;
-
-    return this.hargaRepo.save(harga);
+    const data = await this.findOne(id);
+    Object.assign(data, dto);
+    return await this.hargaRepo.save(data);
   }
 
   async remove(id: number) {
-    const harga = await this.findOne(id);
-    return this.hargaRepo.remove(harga);
+    const data = await this.findOne(id);
+    return await this.hargaRepo.remove(data);
   }
 }

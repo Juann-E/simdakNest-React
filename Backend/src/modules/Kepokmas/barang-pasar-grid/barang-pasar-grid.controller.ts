@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Patch, Delete, Body, UseGuards, NotFoundException } from '@nestjs/common';
+import {
+  Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, NotFoundException
+} from '@nestjs/common';
 import { BarangPasarGridService } from './barang-pasar-grid.service';
 import { CreateBarangPasarGridDto } from './dto/create-barang-pasar.dto';
 import { UpdateBarangPasarGridDto } from './dto/update-barang-pasar.dto';
@@ -39,20 +41,38 @@ export class BarangPasarGridController {
     return this.gridService.filter(idPasar, idBarang);
   }
 
+  // by Body (JSON)
   @Patch('update')
   @Roles(UserRole.ADMIN)
   updateByBody(@Body() body: { idPasar: number; idBarang: number; keterangan?: string }) {
     const { idPasar, idBarang, ...updateData } = body;
     return this.gridService.updateByPasarAndBarang(idPasar, idBarang, updateData);
   }
+  // by URL param
+  @Patch(':idPasar/:idBarang')
+  @Roles(UserRole.ADMIN)
+  updateByParam(
+    @Param('idPasar') idPasar: number,
+    @Param('idBarang') idBarang: number,
+    @Body() dto: UpdateBarangPasarGridDto,
+  ) {
+    return this.gridService.updateByPasarAndBarang(+idPasar, +idBarang, dto);
+  }
 
-
+  //  by Body (JSON)
   @Delete('delete')
   @Roles(UserRole.ADMIN)
   deleteByBody(@Body() body: { idPasar: number; idBarang: number }) {
     const { idPasar, idBarang } = body;
     return this.gridService.removeByPasarAndBarang(idPasar, idBarang);
   }
-
-
+  //  by URL param
+  @Delete(':idPasar/:idBarang')
+  @Roles(UserRole.ADMIN)
+  deleteByParam(
+    @Param('idPasar') idPasar: number,
+    @Param('idBarang') idBarang: number,
+  ) {
+    return this.gridService.removeByPasarAndBarang(+idPasar, +idBarang);
+  }
 }

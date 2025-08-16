@@ -1,4 +1,4 @@
-import { IsOptional, IsNumber } from 'class-validator';
+import { IsOptional, IsNumber, IsString } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateBarangPasarGridDto } from './create-barang-pasar.dto';
 
@@ -10,4 +10,8 @@ export class UpdateBarangPasarGridDto extends PartialType(CreateBarangPasarGridD
   @IsOptional()
   @IsNumber()
   idBarang?: number;
+
+  @IsOptional()
+  @IsString()
+  keterangan?: string;
 }

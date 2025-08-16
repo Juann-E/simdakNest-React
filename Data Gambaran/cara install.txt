@@ -11,7 +11,6 @@ untuk backend
     6. npm install @nestjs/config
     7. npm install ts-node -D
     9. npm install @nestjs/mapped-types
---- ini baru --
     10. npm install class-validator class-transformer
 
     

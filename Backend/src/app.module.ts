@@ -18,7 +18,7 @@ import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/har
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // ✅ load env
+    ConfigModule.forRoot({ isGlobal: true }), // env
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
