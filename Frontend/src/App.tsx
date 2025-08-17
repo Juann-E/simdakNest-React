@@ -11,6 +11,7 @@ import Header from './components/Header';
 import KepokmasPage from './pages/admin/KepokmasPage';
 // Impor komponen baru untuk halaman detail
 import GridDetailPage from './components/admin/kepokmas/GridDetailPage';
+import HargaGridDetailPage from './components/admin/kepokmas/HargaGridDetailPage';
 
 // ==========================================================
 // ## KOMPONEN BARU UNTUK LAYOUT PUBLIK ##
@@ -67,6 +68,7 @@ function App() {
         
         {/* TAMBAHKAN RUTE BARU DI SINI */}
         <Route path="kepokmas/barang-pasar-grid/:marketId" element={<GridDetailPage />} />
+        <Route path="kepokmas/harga-barang-grid/:marketId" element={<HargaGridDetailPage />} />
 
         {/* Tambahkan redirect agar /admin/kepokmas otomatis ke tab pertama */}
         <Route 

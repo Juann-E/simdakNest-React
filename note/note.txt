@@ -4,8 +4,9 @@
 2. 
     ALTER TABLE harga_barang_pasar
     ADD COLUMN keterangan TEXT AFTER harga;
+    
 3.  barang grid full main di body json untuk milih nya
----- ini baru ----
+
 4. jalankan ulang (hapus table lama dulu baru jalankan ini)
     CREATE TABLE harga_barang_pasar (
     id_harga INT AUTO_INCREMENT PRIMARY KEY,
@@ -17,3 +18,7 @@
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+
+===================================================================================
+5. Tambah kategori barang di Nama barang

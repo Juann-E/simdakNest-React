@@ -6,6 +6,7 @@ import NamaPasar from '../../components/admin/kepokmas/NamaPasar';
 import SatuanBarang from '../../components/admin/kepokmas/SatuanBarang'; 
 import NamaBarang from '../../components/admin/kepokmas/NamaBarang';
 import BarangPasarGrid from '../../components/admin/kepokmas/BarangPasarGrid';
+import HargaBarangGrid from '../../components/admin/kepokmas/HargaBarangGrid';
 
 
 // Komponen placeholder untuk tab lainnya
@@ -56,7 +57,7 @@ export default function KepokmasPage() {
       case 'Barang Pasar Grid':
         return <BarangPasarGrid />;
       case 'Harga Barang Grid':
-        return <PlaceholderContent title="Harga Barang Grid" />;
+        return <HargaBarangGrid />;
       case 'Report':
         return <PlaceholderContent title="Report" />;
       default:
