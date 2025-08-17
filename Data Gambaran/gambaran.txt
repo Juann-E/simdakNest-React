@@ -39,7 +39,20 @@ done{
     
 
     report
-        minta kejelasan settingan rumusan tiap repot
+        memilih nama toko / nama pasar
+        lalu memilih nama barang dimana barang itu adalah barang_pasar_grid
+        (pasar dan barang saling berkaitan(relasi)) lalu memilih tanggal awal dan tanggal akhir untuk jangkauan
+        pengambilan data lalu tipe filenya bisa pdf,excel,chart
+        namun sementara buat dulu menjadi excel biar mudah 
+        dan untuk refrensi format excelnya
+        PASAR BLAURAN TANGGAL : 2025-08-01 - 2025-08-16						
+        DINAS PERDAGANGAN KOTA SALATIGA						
+        No	Bahan Pokok	Satuan	01-08-2025	04-08-2025	05-08-2025	06-08-2025
+        1	Beras IR 64 (kw premium) (Kg)	kg	Rp14.500,00	Rp14.500,00	Rp15.000,00	Rp15.000,00
+        2	Beras IR 64 (kw medium) (Kg)	kg	Rp13.500,00	Rp13.500,00	Rp14.000,00	Rp13.500,00
+        3	Gula Pasir Kristal Putih (kw medium) (Kg)	kg	Rp16.000,00	Rp16.000,00	Rp17.000,00	Rp17.000,00
+
+
 
 BBMm LPG
     

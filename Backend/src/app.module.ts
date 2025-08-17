@@ -11,6 +11,7 @@ import { SatuanBarangModule } from './modules/Kepokmas/satuan-barang/satuan-bara
 import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.module';
 import { BarangPasarGridModule } from './modules/Kepokmas/barang-pasar-grid/barang-pasar-grid.module';
 import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/harga-barang-pasar.module';
+import { ReportModule } from './modules/Kepokmas/report/report.module';
 
 @Module({
   providers: [
@@ -36,6 +37,7 @@ import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/har
     NamaBarangModule,
     BarangPasarGridModule,
     HargaBarangPasarModule,
+    ReportModule,
   ],
 })
 export class AppModule { }

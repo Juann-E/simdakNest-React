@@ -12,7 +12,7 @@ untuk backend
     7. npm install ts-node -D
     9. npm install @nestjs/mapped-types
     10. npm install class-validator class-transformer
-
+    11. npm install exceljs
     
 untuk migrating
     1. npx ts-node src/seeds/create-admin.seed.ts

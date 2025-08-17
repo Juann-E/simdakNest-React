@@ -1,44 +1,48 @@
 database kepokmas
-
-nama pasar
-    id pasar (pk)
     nama pasar
-    alamat
-    time stamp
+        id pasar (pk)
+        nama pasar
+        alamat
+        time stamp
 
-satuan barang
-    id satuan (pk)
     satuan barang
-    time stamp
+        id satuan (pk)
+        satuan barang
+        time stamp
 
-nama barang
-    id barang (pk)
     nama barang
-    satuan barang (fk)
-    keterangan (penjelasan tambahan dari produk (contoh barang))
-    time stamp
+        id barang (pk)
+        nama barang
+        satuan barang (fk)
+        keterangan (penjelasan tambahan dari produk (contoh barang))
+        time stamp
 
-barang pasar grid
-    (memanggil data dari table nama pasar untuk memunculkan semua)
-dalaman barang pasar grid
-    id barang pasar (pk)
-    id pasar (fk)
-    nama barang (fk)
-    keterangan (penjelasan tambahan dari produk (contoh barang))
-    time stamp
+    barang pasar grid
+        (memanggil data dari table nama pasar untuk memunculkan semua)
+    dalaman barang pasar grid
+        id barang pasar (pk)
+        id pasar (fk)
+        nama barang (fk)
+        keterangan (penjelasan tambahan dari produk (contoh barang))
+        time stamp
 
-harga pasar grid
-    (memanggil data dari tale nama pasar untuk memunculkan semua)
-dalaman harga pasar grid (add harga barang)
-    id harga pasar (pk)
-    id pasar (fk)
-    nama barang (fk)
-    keterangan (penjelasan tambahan dari produk (contoh barang))
-    time stamp
+    harga pasar grid
+        (memanggil data dari tale nama pasar untuk memunculkan semua)
+    dalaman harga pasar grid (add harga barang)
+        id harga pasar (pk)
+        id pasar (fk)
+        nama barang (fk)
+        keterangan (penjelasan tambahan dari produk (contoh barang))
+        time stamp
 
-    harga barang per pasar update
-        yang di panggil
-            memanggil semua barang dari pasar tersebut
-            time stamp otomatsi ter isis (bisa durubah) per barang
-            menampilkan harga barang lawas ()
-            isi baranbhg baru di berikan time stamp
+        harga barang per pasar update
+            yang di panggil
+                memanggil semua barang dari pasar tersebut
+                time stamp otomatsi ter isis (bisa durubah) per barang
+                menampilkan harga barang lawas ()
+                isi baranbhg baru di berikan time stamp
+
+        
+
+
+database

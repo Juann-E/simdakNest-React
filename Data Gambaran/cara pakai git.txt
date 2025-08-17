@@ -3,7 +3,7 @@ untuk push
     git push -u origin master
     ke branch utamaa
 
-    git add. 
+    git add . 
     git commit -m ""
     git push -u origin master
 

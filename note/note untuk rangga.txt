@@ -1,0 +1,13 @@
+1.  npm install exceljs
+
+2. postman report yang belakangnya tulisan excel itu download file excel
+3. 
+    {
+    "start": "2025-08-15",
+    "end": "2025-08-17",
+    "pasarId": [6,7],
+    "barangId": [15,16]
+    }
+        tanpa pasarId: semua pasar
+        tanpa barangId: semua barangId
+        tanpa param sama sekali: semua pasar dan semua barang
