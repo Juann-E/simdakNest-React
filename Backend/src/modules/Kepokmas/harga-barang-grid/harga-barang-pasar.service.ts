@@ -35,13 +35,29 @@ export class HargaBarangPasarService {
   }
 
   async findAll() {
-    return await this.hargaRepo.find({ relations: ['barangPasar'] });
+    // ## PERUBAHAN UTAMA DI SINI ##
+    // Menambahkan relasi yang lebih dalam agar data pasar dan barang ikut terkirim
+    return await this.hargaRepo.find({
+      relations: [
+        'barangPasar',
+        'barangPasar.pasar',
+        'barangPasar.barang',
+        'barangPasar.barang.satuan',
+      ],
+    });
   }
 
   async findOne(id: number) {
+    // ## PERUBAHAN KONSISTENSI DI SINI ##
+    // Menambahkan relasi yang sama seperti di findAll
     const data = await this.hargaRepo.findOne({
       where: { id_harga: id },
-      relations: ['barangPasar'],
+      relations: [
+        'barangPasar',
+        'barangPasar.pasar',
+        'barangPasar.barang',
+        'barangPasar.barang.satuan',
+      ],
     });
     if (!data) throw new NotFoundException(`Data dengan ID ${id} tidak ditemukan`);
     return data;

@@ -23,40 +23,34 @@ export default function NamaBarang() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // 1. State baru untuk menyimpan input pencarian
   const [searchTerm, setSearchTerm] = useState('');
-
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [formData, setFormData] = useState({ namaBarang: '', keterangan: '', idSatuan: '' });
-
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
   useEffect(() => {
-    // ... (fungsi fetchData tetap sama)
     const fetchData = async () => {
-        setLoading(true);
-        const token = localStorage.getItem('accessToken');
-        if (!token) { setError("Autentikasi gagal."); setLoading(false); return; }
-        const headers = { Authorization: `Bearer ${token}` };
-        try {
-          const [itemsResponse, unitsResponse] = await Promise.all([
-            axios.get('http://localhost:3000/nama-barang', { headers }),
-            axios.get('http://localhost:3000/satuan-barang', { headers })
-          ]);
-          setItems(itemsResponse.data);
-          setUnits(unitsResponse.data);
-        } catch (err) {
-          setError("Gagal mengambil data.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      if (!token) { setError("Autentikasi gagal."); setLoading(false); return; }
+      const headers = { Authorization: `Bearer ${token}` };
+      try {
+        const [itemsResponse, unitsResponse] = await Promise.all([
+          axios.get('http://localhost:3000/nama-barang', { headers }),
+          axios.get('http://localhost:3000/satuan-barang', { headers })
+        ]);
+        setItems(itemsResponse.data);
+        setUnits(unitsResponse.data);
+      } catch (err) {
+        setError("Gagal mengambil data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  // 2. Filter data berdasarkan nama barang ATAU nama satuan
   const filteredItems = items.filter(item => {
     const term = searchTerm.toLowerCase();
     const itemName = item.namaBarang.toLowerCase();
@@ -64,12 +58,72 @@ export default function NamaBarang() {
     return itemName.includes(term) || unitName.includes(term);
   });
   
-  // ... (semua fungsi handle... tetap sama)
-  const handleOpenCreateModal = () => { /*...*/ };
-  const handleOpenEditModal = (item: Item) => { /*...*/ };
-  const handleFormSubmit = async (e: React.FormEvent) => { /*...*/ };
-  const handleOpenDeleteModal = (item: Item) => { /*...*/ };
-  const handleConfirmDelete = async () => { /*...*/ };
+  // --- FUNGSI-FUNGSI YANG KITA ISI KEMBALI ---
+  const handleOpenCreateModal = () => {
+    setEditingItem(null);
+    setFormData({ namaBarang: '', keterangan: '', idSatuan: units[0]?.idSatuan.toString() || '' });
+    setIsFormModalOpen(true);
+  };
+
+  const handleOpenEditModal = (item: Item) => {
+    setEditingItem(item);
+    setFormData({
+      namaBarang: item.namaBarang,
+      keterangan: item.keterangan || '',
+      idSatuan: item.satuan.idSatuan.toString(),
+    });
+    setIsFormModalOpen(true);
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem('accessToken');
+    if (!token) { alert("Sesi berakhir."); return; }
+
+    const url = editingItem 
+      ? `http://localhost:3000/nama-barang/${editingItem.id}` 
+      : 'http://localhost:3000/nama-barang';
+      
+    const method = editingItem ? 'patch' : 'post';
+    
+    const payload = {
+      ...formData,
+      idSatuan: parseInt(formData.idSatuan, 10),
+    };
+
+    try {
+      const response = await axios[method](url, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Ambil ulang data untuk memastikan relasi terupdate
+      const updatedItems = await axios.get('http://localhost:3000/nama-barang', { headers: { Authorization: `Bearer ${token}` } });
+      setItems(updatedItems.data);
+      setIsFormModalOpen(false);
+    } catch (err) {
+      alert("Gagal menyimpan data.");
+    }
+  };
+
+  const handleOpenDeleteModal = (item: Item) => {
+    setItemToDelete(item);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    const token = localStorage.getItem('accessToken');
+    if (!token) { alert("Sesi berakhir."); return; }
+
+    try {
+      await axios.delete(`http://localhost:3000/nama-barang/${itemToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setItems(items.filter(i => i.id !== itemToDelete.id));
+      setItemToDelete(null);
+    } catch (err) {
+      alert("Gagal menghapus barang.");
+    }
+  };
+  // --- AKHIR DARI FUNGSI-FUNGSI ---
 
   return (
     <>
@@ -84,7 +138,6 @@ export default function NamaBarang() {
           </div>
         </div>
         
-        {/* 3. Tambahkan JSX untuk Search Bar */}
         <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input 
@@ -110,12 +163,11 @@ export default function NamaBarang() {
                 {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
                 {error && <tr><td colSpan={4} className="text-center py-4 text-red-500">{error}</td></tr>}
                 
-                {/* 4. Tabel sekarang me-render 'filteredItems' */}
                 {!loading && !error && filteredItems.map((item) => (
                     <tr key={item.id}>
                       <td className="px-6 py-4 whitespace-nowrap font-medium">{item.namaBarang}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-500">{item.satuan?.satuanBarang || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">{item.keterangan}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">{item.keterangan || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                           <button onClick={() => handleOpenEditModal(item)} className="text-blue-600 hover:text-blue-900"><Edit size={16} /></button>
                           <button onClick={() => handleOpenDeleteModal(item)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
@@ -123,7 +175,6 @@ export default function NamaBarang() {
                     </tr>
                 ))}
 
-                {/* 5. Pesan jika hasil pencarian kosong */}
                 {!loading && filteredItems.length === 0 && (
                   <tr>
                     <td colSpan={4} className="text-center py-4 text-gray-500">
@@ -136,13 +187,41 @@ export default function NamaBarang() {
         </div>
       </div>
 
-      {/* ... (Modal dan ConfirmationModal tidak perlu diubah) ... */}
       <Modal 
         isOpen={isFormModalOpen} 
         onClose={() => setIsFormModalOpen(false)} 
         title={editingItem ? "Edit Barang" : "Tambah Barang Baru"}
       >
-        {/* ... Isi form ... */}
+        <form onSubmit={handleFormSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="item-name" className="block text-sm font-medium text-gray-700">Nama Barang</label>
+              <input type="text" id="item-name" value={formData.namaBarang} onChange={(e) => setFormData({ ...formData, namaBarang: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required />
+            </div>
+            <div>
+              <label htmlFor="item-unit" className="block text-sm font-medium text-gray-700">Satuan</label>
+              <select id="item-unit" value={formData.idSatuan} onChange={(e) => setFormData({ ...formData, idSatuan: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+                <option value="" disabled>Pilih satuan...</option>
+                {units.map(unit => (
+                  <option key={unit.idSatuan} value={unit.idSatuan}>{unit.satuanBarang}</option>
+                ))}
+              </select>
+            </div>
+             <div>
+              <label htmlFor="item-desc" className="block text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
+              <textarea id="item-desc" value={formData.keterangan} onChange={(e) => setFormData({ ...formData, keterangan: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" rows={3}></textarea>
+            </div>
+          </div>
+          <div className="mt-6 flex justify-end space-x-3">
+            <button type="button" onClick={() => setIsFormModalOpen(false)} className="btn-secondary">Batal</button>
+            <button type="submit" className="btn-primary">
+              {editingItem ? "Simpan Perubahan" : "Tambah"}
+            </button>
+          </div>
+        </form>
       </Modal>
 
       <ConfirmationModal 

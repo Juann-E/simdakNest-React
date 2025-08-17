@@ -1,138 +1,237 @@
 // src/components/admin/kepokmas/HargaGridDetailPage.tsx
-
+    
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Edit, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Search, Save } from 'lucide-react';
+import BulkPriceInputModal from './BulkPriceInputModal';
+import Modal from '../../ui/Modal';
+import ConfirmationModal from '../../ui/ConfirmationModal';
 
-// Definisikan tipe data yang diperlukan
-interface GridItem {
-  id_barang_pasar: number;
-  barang: {
-    namaBarang: string;
-    satuan: { satuanBarang: string };
-  };
-}
-interface HargaItem {
+// Definisikan tipe data
+interface PriceData { id_harga: number; harga: number; tanggal_harga: string; }
+interface PriceHistoryItem {
   id_harga: number;
   harga: number;
-  barang: { id_barang_pasar: number };
+  tanggal_harga: string;
+  keterangan?: string;
+  barangPasar: {
+    id_barang_pasar: number;
+    barang: { namaBarang: string; satuan: { satuanBarang: string } };
+    pasar: { id: number; nama_pasar: string; };
+  };
 }
 
 export default function HargaGridDetailPage() {
-  const { marketId } = useParams();
+  const { marketId } = useParams<{ marketId: string }>();
   const [marketName, setMarketName] = useState('');
-  const [gridItems, setGridItems] = useState<GridItem[]>([]);
-  const [prices, setPrices] = useState<Map<number, number>>(new Map());
-  const [editingPriceId, setEditingPriceId] = useState<number | null>(null);
-  const [newPrice, setNewPrice] = useState('');
+  const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Pastikan state ini dideklarasikan dengan benar
+  const [latestPriceMap, setLatestPriceMap] = useState<Map<number, PriceData>>(new Map());
 
-  useEffect(() => {
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<PriceHistoryItem | null>(null);
+  const [editingItem, setEditingItem] = useState<PriceHistoryItem | null>(null);
+  const [formData, setFormData] = useState({ harga: '', tanggal_harga: '', keterangan: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const numericMarketId = parseInt(marketId || '0', 10);
+
+  const fetchData = async () => {
+    setLoading(true);
     const token = localStorage.getItem('accessToken');
+    if (!token) { setLoading(false); return; }
     const headers = { Authorization: `Bearer ${token}` };
-
-    const fetchDetails = async () => {
-      try {
-        const marketRes = await axios.get('http://localhost:3000/nama-pasar', { headers });
-        const currentMarket = marketRes.data.find(m => m.id === parseInt(marketId!));
-        if (currentMarket) setMarketName(currentMarket.nama_pasar);
-
-        const gridRes = await axios.post('http://localhost:3000/barang-pasar-grid/filter', { idPasar: parseInt(marketId!) }, { headers });
-        setGridItems(gridRes.data);
-
-        const hargaRes = await axios.get('http://localhost:3000/harga-barang-pasar', { headers });
-        const priceMap = new Map<number, number>();
-        hargaRes.data.forEach((p: HargaItem) => {
-          priceMap.set(p.barang.id_barang_pasar, p.harga);
-        });
-        setPrices(priceMap);
-
-      } catch (error) {
-        console.error("Gagal memuat data", error);
-      }
-    };
-
-    if (marketId) fetchDetails();
-  }, [marketId]);
-
-  const handleSavePrice = async (gridItemId: number) => {
-    const token = localStorage.getItem('accessToken');
-    const headers = { Authorization: `Bearer ${token}` };
-    const priceValue = parseInt(newPrice);
 
     try {
-      // Cek apakah sudah ada harga sebelumnya
-      const existingPrices: HargaItem[] = (await axios.get('http://localhost:3000/harga-barang-pasar', { headers })).data;
-      const existingPrice = existingPrices.find(p => p.barang.id_barang_pasar === gridItemId);
+      const [marketRes, hargaRes] = await Promise.all([
+        axios.get('http://localhost:3000/nama-pasar', { headers }),
+        axios.get('http://localhost:3000/harga-barang-pasar', { headers }),
+      ]);
+      
+      const currentMarket = marketRes.data.find(m => m.id === numericMarketId);
+      if (currentMarket) setMarketName(currentMarket.nama_pasar);
 
-      if (existingPrice) {
-        // Update harga yang ada
-        await axios.put(`http://localhost:3000/harga-barang-pasar/${existingPrice.id_harga}`, { harga: priceValue }, { headers });
-      } else {
-        // Buat harga baru
-        await axios.post('http://localhost:3000/harga-barang-pasar', { id_barang_pasar: gridItemId, harga: priceValue }, { headers });
+      const allPricesForMarket = hargaRes.data.filter((p: PriceHistoryItem) => p.barangPasar?.pasar?.id === numericMarketId);
+      
+      const sortedHistory = [...allPricesForMarket].sort((a, b) => new Date(b.tanggal_harga).getTime() - new Date(a.tanggal_harga).getTime());
+      setPriceHistory(sortedHistory);
+      
+      const newLatestPriceMap = new Map<number, PriceData>();
+      const pricesByGridItem: { [key: number]: PriceHistoryItem[] } = {};
+      allPricesForMarket.forEach((p: PriceHistoryItem) => {
+        const gridId = p.barangPasar.id_barang_pasar;
+        if (!pricesByGridItem[gridId]) pricesByGridItem[gridId] = [];
+        pricesByGridItem[gridId].push(p);
+      });
+
+      for (const gridId in pricesByGridItem) {
+        const latestPrice = pricesByGridItem[gridId].sort((a, b) => new Date(b.tanggal_harga).getTime() - new Date(a.tanggal_harga).getTime())[0];
+        newLatestPriceMap.set(parseInt(gridId), latestPrice);
       }
-
-      // Update state lokal untuk UI responsif
-      setPrices(new Map(prices.set(gridItemId, priceValue)));
-      setEditingPriceId(null);
-      setNewPrice('');
+      setLatestPriceMap(newLatestPriceMap);
 
     } catch (error) {
-      alert("Gagal menyimpan harga.");
+      console.error("Gagal memuat data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (numericMarketId) {
+      fetchData();
+    }
+  }, [numericMarketId]);
+
+  const filteredPriceHistory = priceHistory.filter(item => {
+    const term = searchTerm.toLowerCase();
+    const itemName = item.barangPasar?.barang?.namaBarang.toLowerCase() || '';
+    const itemPrice = item.harga.toString();
+    const itemDate = new Date(item.tanggal_harga).toLocaleDateString('id-ID',{ day: '2-digit', month: '2-digit', year: 'numeric' });
+    return itemName.includes(term) || itemPrice.includes(term) || itemDate.includes(term);
+  });
+  
+  const handleOpenEditModal = (item: PriceHistoryItem) => {
+    setEditingItem(item);
+    setFormData({
+      harga: item.harga.toString(),
+      tanggal_harga: new Date(item.tanggal_harga).toISOString().split('T')[0],
+      keterangan: item.keterangan || ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdatePrice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    const token = localStorage.getItem('accessToken');
+    try {
+      await axios.put(`http://localhost:3000/harga-barang-pasar/${editingItem.id_harga}`, {
+        harga: parseInt(formData.harga),
+        tanggal_harga: formData.tanggal_harga,
+        keterangan: formData.keterangan,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      
+      await fetchData();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      alert("Gagal memperbarui harga.");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    const token = localStorage.getItem('accessToken');
+    try {
+      await axios.delete(`http://localhost:3000/harga-barang-pasar/${itemToDelete.id_harga}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPriceHistory(priceHistory.filter(p => p.id_harga !== itemToDelete.id_harga));
+      setItemToDelete(null);
+    } catch (error) {
+      alert("Gagal menghapus data harga.");
     }
   };
 
   return (
-    <div className="mt-6 bg-white p-6 rounded-lg shadow-sm border">
-      <Link to="/admin/kepokmas/harga-barang-grid" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mb-4">
-        <ArrowLeft size={16} />
-        Kembali ke Daftar Pasar
-      </Link>
-      <h2 className="text-xl font-bold text-gray-800">Kelola Harga: {marketName}</h2>
+    <>
+      <div className="mt-6 bg-white p-6 rounded-lg shadow-sm border">
+        <Link to="/admin/kepokmas/harga-barang-grid" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mb-4">
+          <ArrowLeft size={16} />
+          Kembali ke Daftar Pasar
+        </Link>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Riwayat Harga: {marketName}</h2>
+            <p className="text-sm text-gray-500">Menampilkan semua data harga yang pernah diinput</p>
+          </div>
+          <button onClick={() => setIsBulkModalOpen(true)} className="btn-primary"><Plus size={16} className="mr-2"/>Input Harga Harian</button>
+        </div>
+        
+        <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Cari berdasarkan nama, harga, atau tanggal..." 
+              className="w-full pl-10 pr-4 py-2 border rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </div>
+        
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Harga</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keterangan</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+              {loading && <tr><td colSpan={5} className="text-center py-4">Memuat data...</td></tr>}
+              {!loading && filteredPriceHistory.length === 0 && <tr><td colSpan={5} className="text-center py-4 text-gray-500">Belum ada riwayat harga untuk pasar ini.</td></tr>}
+              {!loading && filteredPriceHistory.map(item => (
+                  <tr key={item.id_harga}>
+                      <td className="px-6 py-4 font-medium">{item.barangPasar?.barang?.namaBarang || 'N/A'}</td>
+                      <td className="px-6 py-4 text-gray-600">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.harga)}</td>
+                      <td className="px-6 py-4 text-gray-500">{new Date(item.tanggal_harga).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                      <td className="px-6 py-4 text-gray-500">{item.keterangan || '-'}</td>
+                      <td className="px-6 py-4 space-x-2">
+                          <button onClick={() => handleOpenEditModal(item)} className="text-blue-600 hover:text-blue-900"><Edit size={16} /></button>
+                          <button onClick={() => setItemToDelete(item)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
+                      </td>
+                  </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
 
-      <table className="min-w-full divide-y divide-gray-200 mt-4">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-            {gridItems.map(item => (
-                <tr key={item.id_barang_pasar}>
-                    <td className="px-6 py-4">{item.barang.namaBarang} ({item.barang.satuan?.satuanBarang})</td>
-                    <td className="px-6 py-4">
-                      {editingPriceId === item.id_barang_pasar ? (
-                        <input 
-                          type="number" 
-                          value={newPrice}
-                          onChange={(e) => setNewPrice(e.target.value)}
-                          className="px-2 py-1 border rounded-md w-32"
-                          autoFocus
-                        />
-                      ) : (
-                        prices.get(item.id_barang_pasar) 
-                          ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(prices.get(item.id_barang_pasar)!)
-                          : <span className="text-gray-400">Belum ada harga</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingPriceId === item.id_barang_pasar ? (
-                        <button onClick={() => handleSavePrice(item.id_barang_pasar)} className="text-green-600 hover:text-green-900">
-                          <Save size={16} />
-                        </button>
-                      ) : (
-                        <button onClick={() => { setEditingPriceId(item.id_barang_pasar); setNewPrice(prices.get(item.id_barang_pasar)?.toString() || ''); }} className="text-blue-600 hover:text-blue-900">
-                          <Edit size={16} />
-                        </button>
-                      )}
-                    </td>
-                </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
+      <BulkPriceInputModal 
+        isOpen={isBulkModalOpen} 
+        onClose={() => setIsBulkModalOpen(false)}
+        marketId={numericMarketId}
+        marketName={marketName}
+        onSuccess={fetchData}
+        latestPrices={latestPriceMap}
+      />
+
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={`Edit Harga untuk ${editingItem?.barangPasar?.barang?.namaBarang}`}>
+        <form onSubmit={handleUpdatePrice} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Tanggal</label>
+            <input type="date" value={formData.tanggal_harga} onChange={(e) => setFormData({...formData, tanggal_harga: e.target.value})}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Harga (Rp)</label>
+            <input type="number" value={formData.harga} onChange={(e) => setFormData({...formData, harga: e.target.value})}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Keterangan</label>
+            <textarea value={formData.keterangan} onChange={(e) => setFormData({...formData, keterangan: e.target.value})}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" rows={3}></textarea>
+          </div>
+          <div className="pt-2 flex justify-end space-x-3">
+            <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn-secondary">Batal</button>
+            <button type="submit" className="btn-primary">Simpan Perubahan</button>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmationModal 
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Konfirmasi Hapus"
+        message={`Anda yakin ingin menghapus data harga ini?`}
+      />
+    </>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Table, Edit, Search } from 'lucide-react';
+import { Table, PlusCircle, Search } from 'lucide-react'; // <-- Ganti Edit dengan PlusCircle
 
 interface Market {
   id: number;
@@ -84,10 +84,12 @@ export default function HargaBarangGrid() {
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">{market.alamat}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div 
-                          className="text-blue-600 hover:text-blue-900"
+                          // Ganti warna menjadi hijau agar konsisten
+                          className="text-green-600 hover:text-green-900"
                           title={`Kelola Harga di ${market.nama_pasar}`}
                         >
-                          <Edit size={20} />
+                          {/* Ganti ikon Edit menjadi PlusCircle */}
+                          <PlusCircle size={20} />
                         </div>
                     </td>
                   </tr>

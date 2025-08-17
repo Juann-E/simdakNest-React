@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Plus, Trash2, ArrowLeft, Search } from 'lucide-react'; // <-- Tambahkan ikon Search
+import { Plus, Trash2, ArrowLeft, Search, Edit, Save } from 'lucide-react';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
-// (Interface-interface tetap sama)
+// Interface untuk tipe data
 interface Market { id: number; nama_pasar: string; }
 interface Unit { idSatuan: number; satuanBarang: string; }
 interface Item { id: number; namaBarang: string; satuan: Unit; }
@@ -26,16 +26,19 @@ export default function GridDetailPage() {
 
   // State untuk form tambah barang
   const [selectedItemId, setSelectedItemId] = useState('');
-  const [keterangan, setKeterangan] = useState(''); // <-- State baru untuk keterangan
+  const [keterangan, setKeterangan] = useState('');
 
-  // State baru untuk search bar
+  // State untuk search bar
   const [searchTerm, setSearchTerm] = useState('');
+
+  // State untuk mode edit inline
+  const [editingGridItemId, setEditingGridItemId] = useState<number | null>(null);
+  const [editKeterangan, setEditKeterangan] = useState('');
 
   const numericMarketId = parseInt(marketId || '0', 10);
 
   useEffect(() => {
     if (numericMarketId) {
-      // (Fungsi fetchDetails tetap sama)
       const fetchDetails = async () => {
         setLoading(true);
         const token = localStorage.getItem('accessToken');
@@ -74,7 +77,6 @@ export default function GridDetailPage() {
     return allItems.filter(item => !existingItemIds.has(item.id));
   }, [allItems, gridItems]);
 
-  // Filter data untuk tabel berdasarkan searchTerm
   const filteredGridItems = gridItems.filter(item =>
     item.barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -87,7 +89,7 @@ export default function GridDetailPage() {
         const response = await axios.post('http://localhost:3000/barang-pasar-grid', {
             idPasar: numericMarketId,
             idBarang: parseInt(selectedItemId),
-            keterangan: keterangan, // <-- Kirim data keterangan
+            keterangan: keterangan,
         }, { headers: { Authorization: `Bearer ${token}` } });
         
         const newItemFullData = allItems.find(item => item.id === parseInt(selectedItemId));
@@ -97,14 +99,13 @@ export default function GridDetailPage() {
         }
         setIsModalOpen(false);
         setSelectedItemId('');
-        setKeterangan(''); // <-- Reset state keterangan
+        setKeterangan('');
     } catch (error) {
         alert("Gagal menambahkan barang. Mungkin barang sudah ada.");
     }
   };
   
   const handleConfirmDelete = async () => {
-    // (Fungsi ini tetap sama)
     if (!itemToDelete) return;
     const token = localStorage.getItem('accessToken');
     try {
@@ -113,6 +114,34 @@ export default function GridDetailPage() {
         setItemToDelete(null);
     } catch (error) {
         alert("Gagal menghapus barang.");
+    }
+  };
+
+  const handleOpenEditMode = (item: GridItem) => {
+    setEditingGridItemId(item.id_barang_pasar);
+    setEditKeterangan(item.keterangan || '');
+  };
+
+  const handleSaveKeterangan = async (itemToUpdate: GridItem) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/barang-pasar-grid/${itemToUpdate.pasar.id}/${itemToUpdate.barang.id}`,
+        { keterangan: editKeterangan },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setGridItems(gridItems.map(item => 
+        item.id_barang_pasar === itemToUpdate.id_barang_pasar 
+          ? { ...item, keterangan: response.data.keterangan } 
+          : item
+      ));
+
+      setEditingGridItemId(null);
+      setEditKeterangan('');
+
+    } catch (error) {
+      alert("Gagal menyimpan perubahan keterangan.");
     }
   };
 
@@ -131,7 +160,6 @@ export default function GridDetailPage() {
           <button onClick={() => setIsModalOpen(true)} className="btn-primary"><Plus size={16} className="mr-2"/>Tambah Barang</button>
         </div>
 
-        {/* Search Bar Baru */}
         <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input 
@@ -144,19 +172,48 @@ export default function GridDetailPage() {
         </div>
         
         <table className="min-w-full divide-y divide-gray-200">
-          {/* ... thead tetap sama ... */}
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Satuan</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keterangan</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
           <tbody className="bg-white divide-y divide-gray-200">
               {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
               {!loading && filteredGridItems.length === 0 && <tr><td colSpan={4} className="text-center py-4 text-gray-500">{gridItems.length > 0 ? 'Barang tidak ditemukan.' : 'Belum ada barang di pasar ini.'}</td></tr>}
               
-              {/* Tabel sekarang menggunakan filteredGridItems */}
               {!loading && filteredGridItems.map(item => (
                   <tr key={item.id_barang_pasar}>
                       <td className="px-6 py-4 font-medium">{item.barang.namaBarang}</td>
                       <td className="px-6 py-4 text-gray-500">{item.barang.satuan?.satuanBarang || 'N/A'}</td>
-                      <td className="px-6 py-4 text-gray-500">{item.keterangan || '-'}</td>
-                      <td className="px-6 py-4">
-                          <button onClick={() => setItemToDelete(item)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
+                      <td className="px-6 py-4 text-gray-500 w-1/3">
+                        {editingGridItemId === item.id_barang_pasar ? (
+                          <input
+                            type="text"
+                            value={editKeterangan}
+                            onChange={(e) => setEditKeterangan(e.target.value)}
+                            className="px-2 py-1 border rounded-md w-full"
+                            autoFocus
+                          />
+                        ) : (
+                          item.keterangan || '-'
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                          {editingGridItemId === item.id_barang_pasar ? (
+                            <button onClick={() => handleSaveKeterangan(item)} className="text-green-600 hover:text-green-900" title="Simpan">
+                              <Save size={16} />
+                            </button>
+                          ) : (
+                            <button onClick={() => handleOpenEditMode(item)} className="text-blue-600 hover:text-blue-900" title="Edit Keterangan">
+                              <Edit size={16} />
+                            </button>
+                          )}
+                          <button onClick={() => setItemToDelete(item)} className="text-red-600 hover:text-red-900" title="Hapus Barang dari Pasar">
+                            <Trash2 size={16} />
+                          </button>
                       </td>
                   </tr>
               ))}
@@ -178,7 +235,6 @@ export default function GridDetailPage() {
                 {availableItemsToAdd.length === 0 && <p className="text-xs text-gray-500 mt-1">Semua barang sudah ditambahkan ke pasar ini.</p>}
               </div>
               
-              {/* Field Keterangan Baru */}
               <div>
                 <label htmlFor="item-keterangan" className="block text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
                 <textarea id="item-keterangan" value={keterangan} onChange={e => setKeterangan(e.target.value)}

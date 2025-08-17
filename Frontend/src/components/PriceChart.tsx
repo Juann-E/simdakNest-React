@@ -1,51 +1,143 @@
 // src/components/PriceChart.tsx
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BarChart3 } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
-// Data bohongan untuk tren harga
-const priceTrendData = [
-  { day: 'Sab', Beras: 14200, Cabai: 38000, Bawang: 25000 },
-  { day: 'Min', Beras: 14100, Cabai: 37500, Bawang: 24800 },
-  { day: 'Sen', Beras: 14150, Cabai: 37800, Bawang: 25100 },
-  { day: 'Sel', Beras: 14250, Cabai: 36000, Bawang: 25500 },
-  { day: 'Rab', Beras: 14300, Cabai: 35500, Bawang: 25300 },
-  { day: 'Kam', Beras: 14200, Cabai: 34000, Bawang: 25800 },
-  { day: 'Jum', Beras: 14400, Cabai: 33500, Bawang: 26000 },
-];
-
-const formatToRupiah = (tickItem: number) => {
-    return new Intl.NumberFormat('id-ID', { 
-        style: 'currency', 
-        currency: 'IDR', 
-        minimumFractionDigits: 0 
-    }).format(tickItem);
+// Definisikan tipe data yang kita butuhkan
+interface Market {
+  id: number;
+  nama_pasar: string;
+}
+interface PriceHistoryItem {
+  harga: number;
+  tanggal_harga: string;
+  barangPasar: {
+    pasar: { id: number };
+    barang: { namaBarang: string; };
+  };
 }
 
 export default function PriceChart() {
+  const [allMarkets, setAllMarkets] = useState<Market[]>([]);
+  const [allPrices, setAllPrices] = useState<PriceHistoryItem[]>([]);
+  const [selectedMarketId, setSelectedMarketId] = useState<string>('');
+  
+  const [chartData, setChartData] = useState([]);
+  const [chartLines, setChartLines] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Ambil semua data mentah sekali saja saat komponen dimuat
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      if (!token) { setLoading(false); return; }
+      const headers = { Authorization: `Bearer ${token}` };
+
+      try {
+        const [marketsRes, pricesRes] = await Promise.all([
+          axios.get('http://localhost:3000/nama-pasar', { headers }),
+          axios.get('http://localhost:3000/harga-barang-pasar', { headers })
+        ]);
+
+        setAllMarkets(marketsRes.data);
+        setAllPrices(pricesRes.data);
+        
+        // Set pasar pertama sebagai default jika ada
+        if (marketsRes.data.length > 0) {
+          setSelectedMarketId(marketsRes.data[0].id.toString());
+        }
+
+      } catch (error) {
+        console.error("Gagal mengambil data untuk grafik:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, []);
+
+  // 2. Proses ulang data setiap kali pasar yang dipilih berubah
+  useEffect(() => {
+    if (!selectedMarketId || allPrices.length === 0) return;
+
+    const numericMarketId = parseInt(selectedMarketId);
+
+    // Filter harga hanya untuk pasar yang dipilih
+    const pricesForSelectedMarket = allPrices.filter(
+      p => p.barangPasar?.pasar?.id === numericMarketId
+    );
+
+    const recentDates = [...new Set(pricesForSelectedMarket.map(p => p.tanggal_harga.split('T')[0]))]
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+        .slice(0, 5).reverse();
+
+    const groupedByDate: { [key: string]: any } = {};
+    recentDates.forEach(date => {
+      groupedByDate[date] = { day: new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };
+    });
+
+    pricesForSelectedMarket.forEach(p => {
+      const date = p.tanggal_harga.split('T')[0];
+      if (groupedByDate[date]) {
+        groupedByDate[date][p.barangPasar.barang.namaBarang] = p.harga;
+      }
+    });
+    
+    const formattedChartData = Object.values(groupedByDate);
+    setChartData(formattedChartData);
+
+    // Tentukan garis berdasarkan data yang ada di pasar terpilih
+    const popularItems = ['Beras', 'Cabai', 'Bawang Merah', 'Daging Sapi', 'Minyak Goreng'];
+    const lineKeys = [...new Set(pricesForSelectedMarket.map(p => p.barangPasar.barang.namaBarang))]
+        .filter(name => popularItems.some(popular => name.toLowerCase().includes(popular.toLowerCase())))
+        .slice(0, 5);
+        
+    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
+    setChartLines(lineKeys.map((key, index) => ({ key, color: colors[index % colors.length] })));
+
+  }, [selectedMarketId, allPrices]);
+
+  const formatToRupiah = (tickItem: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(tickItem);
+
   return (
-    <div className="rounded-lg border bg-white text-gray-800 shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center">
-          <BarChart3 className="w-5 h-5 mr-2" />
-          Grafik Harga 7 Hari Terakhir
-        </h3>
-        <p className="text-sm text-gray-500">
-          Pergerakan harga komoditas utama dalam seminggu terakhir.
-        </p>
+    <div className="rounded-lg border bg-white text-gray-800 shadow-sm h-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-6">
+        <div>
+          <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2" />
+            Tren Harga Komoditas
+          </h3>
+          <p className="text-sm text-gray-500">Pergerakan harga bahan pokok utama yang tercatat.</p>
+        </div>
+        {/* 3. Dropdown untuk memilih pasar */}
+        <div className="mt-4 md:mt-0">
+          <select 
+            value={selectedMarketId}
+            onChange={(e) => setSelectedMarketId(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            disabled={loading}
+          >
+            {loading ? <option>Memuat pasar...</option> : allMarkets.map(market => (
+              <option key={market.id} value={market.id}>{market.nama_pasar}</option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="p-6 pt-0">
         <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={priceTrendData} margin={{ top: 5, right: 20, left: 30, bottom: 5 }}>
+                <LineChart data={chartData} margin={{ top: 5, right: 20, left: 30, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" />
                     <YAxis tickFormatter={(tick) => `Rp${tick/1000}k`} />
                     <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} formatter={formatToRupiah} />
                     <Legend />
-                    <Line type="monotone" dataKey="Beras" stroke="#8884d8" strokeWidth={2} />
-                    <Line type="monotone" dataKey="Cabai" stroke="#ffc658" strokeWidth={2} />
-                    <Line type="monotone" dataKey="Bawang" stroke="#ff7300" strokeWidth={2} />
+                    {chartLines.map(line => (
+                      <Line key={line.key} type="monotone" dataKey={line.key} stroke={line.color} strokeWidth={2} connectNulls={true}/>
+                    ))}
                 </LineChart>
             </ResponsiveContainer>
         </div>
