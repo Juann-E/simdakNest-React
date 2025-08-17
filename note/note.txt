@@ -21,4 +21,6 @@
 
 
 ===================================================================================
-5. Tambah kategori barang di Nama barang
+5.
+ ALTER TABLE harga_barang_pasar
+ADD COLUMN tanggal_harga DATE NOT NULL;

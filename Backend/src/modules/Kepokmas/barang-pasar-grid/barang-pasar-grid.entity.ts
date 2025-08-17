@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, JoinColumn, CreateDateColumn ,OneToMany } from 'typeorm';
 import { NamaPasar } from '../nama-pasar/nama-pasar.entity';
 import { NamaBarang } from '../nama-barang/nama-barang.entity';
+import { HargaBarangPasar } from '../harga-barang-grid/harga-barang-pasar.entity';
 
 @Entity()
 export class BarangPasarGrid {
@@ -20,4 +21,7 @@ export class BarangPasarGrid {
 
   @CreateDateColumn({ name: 'time_stamp' })
   time_stamp: Date;
+
+  @OneToMany(() => HargaBarangPasar, (harga) => harga.barangPasar)
+  hargaBarang: HargaBarangPasar[];
 }

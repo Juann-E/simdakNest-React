@@ -10,38 +10,39 @@ export class HargaBarangPasarService {
   constructor(
     @InjectRepository(HargaBarangPasar)
     private hargaRepo: Repository<HargaBarangPasar>,
-  ) { }
+  ) {}
 
   async create(dto: CreateHargaBarangPasarDto) {
     const harga = this.hargaRepo.create(dto);
     return await this.hargaRepo.save(harga);
   }
 
-  async filter(params: { idHarga?: number; idBarangPasar?: number }) {
+  async filter(params: { id_harga?: number; id_barang_pasar?: number }) {
     const query = this.hargaRepo.createQueryBuilder('harga')
-      .leftJoinAndSelect('harga.barang', 'barang')
-      .leftJoinAndSelect('barang.pasar', 'pasar')
-      .leftJoinAndSelect('barang.barang', 'nama_barang');
+      .leftJoinAndSelect('harga.barangPasar', 'barangPasar')
+      .leftJoinAndSelect('barangPasar.pasar', 'pasar')
+      .leftJoinAndSelect('barangPasar.barang', 'barang');
 
-    if (params.idHarga) {
-      query.andWhere('harga.id_harga = :id_harga', { id_harga: params.idHarga });
+    if (params.id_harga) {
+      query.andWhere('harga.id_harga = :id_harga', { id_harga: params.id_harga });
     }
 
-    if (params.idBarangPasar) {
-      query.andWhere('harga.id_barang_pasar = :id_barang_pasar', { id_barang_pasar: params.idBarangPasar });
+    if (params.id_barang_pasar) {
+      query.andWhere('harga.id_barang_pasar = :id_barang_pasar', { id_barang_pasar: params.id_barang_pasar });
     }
 
     return await query.getMany();
   }
 
-
-
   async findAll() {
-    return await this.hargaRepo.find({ relations: ['barang'] });
+    return await this.hargaRepo.find({ relations: ['barangPasar'] });
   }
 
   async findOne(id: number) {
-    const data = await this.hargaRepo.findOne({ where: { id_harga: id }, relations: ['barang'] });
+    const data = await this.hargaRepo.findOne({
+      where: { id_harga: id },
+      relations: ['barangPasar'],
+    });
     if (!data) throw new NotFoundException(`Data dengan ID ${id} tidak ditemukan`);
     return data;
   }

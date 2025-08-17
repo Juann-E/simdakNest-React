@@ -22,43 +22,43 @@ export class HargaBarangPasarController {
     return this.hargaService.create(dto);
   }
 
-  // EAD (all)
+  // READ (all)
   @Get()
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async findAll() {
     return this.hargaService.findAll();
   }
 
-  // READ ( by idHarga / idBarangPasar)
+  // FILTER (by id_harga / id_barang_pasar)
   @Post('filter')
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async filter(
-    @Body('id_harga') idHarga?: number,
-    @Body('idBarangPasar') idBarangPasar?: number,
+    @Body('id_harga') id_harga?: number,
+    @Body('id_barang_pasar') id_barang_pasar?: number,
   ) {
-    return this.hargaService.filter({ idHarga, idBarangPasar });
+    return this.hargaService.filter({ id_harga, id_barang_pasar });
   }
 
-  //  READ (one by id)
+  // READ (one by id)
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async findOne(@Param('id') id: number) {
     return this.hargaService.findOne(+id);
   }
 
-  //  UPDATE (id di URL)
+  // UPDATE (id di URL)
   @Put(':id')
   @Roles(UserRole.ADMIN)
   async updateByUrl(@Param('id') id: number, @Body() dto: UpdateHargaBarangPasarDto) {
     return this.hargaService.update(+id, dto);
   }
 
-  //  UPDATE ( id di body)
+  // UPDATE (id di body)
   @Put()
   @Roles(UserRole.ADMIN)
   async updateByBody(
     @Body('id_harga') id: number,
-    @Body() dto: UpdateHargaBarangPasarDto
+    @Body() dto: UpdateHargaBarangPasarDto,
   ) {
     if (!id) throw new BadRequestException('id_harga harus ada di body');
     return this.hargaService.update(+id, dto);
@@ -71,7 +71,7 @@ export class HargaBarangPasarController {
     return this.hargaService.remove(+id);
   }
 
-  //DELETE (id di body)
+  // DELETE (id di body)
   @Delete()
   @Roles(UserRole.ADMIN)
   async removeByBody(@Body('id_harga') id: number) {

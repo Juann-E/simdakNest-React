@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateHargaBarangPasarDto {
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
-  idBarangPasar: number;
+  id_barang_pasar: number;
 
   @IsNotEmpty()
   @Type(() => Number)
@@ -15,4 +15,8 @@ export class CreateHargaBarangPasarDto {
   @IsOptional()
   @IsString()
   keterangan?: string;
+
+  @IsNotEmpty()
+  @IsDateString({}, { message: 'Format tanggal_harga harus YYYY-MM-DD' })
+  tanggal_harga: string;
 }

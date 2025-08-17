@@ -63,6 +63,7 @@ CREATE TABLE harga_barang_pasar (
     harga DECIMAL(15,2) NOT NULL,
     keterangan TEXT,
     time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    tanggal_harga DATE NOT NULL,
     FOREIGN KEY (id_barang_pasar) REFERENCES barang_pasar_grid(id_barang_pasar)
         ON UPDATE CASCADE
         ON DELETE CASCADE

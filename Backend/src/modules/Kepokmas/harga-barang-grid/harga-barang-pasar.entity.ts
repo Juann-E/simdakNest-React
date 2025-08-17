@@ -1,13 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BarangPasarGrid } from '../barang-pasar-grid/barang-pasar-grid.entity';
 
 @Entity('harga_barang_pasar')
 export class HargaBarangPasar {
   @PrimaryGeneratedColumn()
   id_harga: number;
-  
-  @Column({ name: 'id_barang_pasar' })
-  idBarangPasar: number;
+
+  @Column()
+  id_barang_pasar: number;
+
+  @ManyToOne(() => BarangPasarGrid, (barangPasar) => barangPasar.hargaBarang, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'id_barang_pasar' })
+  barangPasar: BarangPasarGrid;
 
   @Column('decimal', { precision: 15, scale: 2 })
   harga: number;
@@ -15,11 +22,9 @@ export class HargaBarangPasar {
   @Column({ type: 'text', nullable: true })
   keterangan: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   time_stamp: Date;
 
-  @ManyToOne(() => BarangPasarGrid, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'id_barang_pasar' })
-  barang: BarangPasarGrid;
-
+  @Column({ type: 'date' })
+  tanggal_harga: Date;
 }
