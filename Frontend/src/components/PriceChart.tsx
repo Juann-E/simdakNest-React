@@ -92,10 +92,9 @@ export default function PriceChart() {
     // Tentukan garis berdasarkan data yang ada di pasar terpilih
     const popularItems = ['Beras', 'Cabai', 'Bawang Merah', 'Daging Sapi', 'Minyak Goreng'];
     const lineKeys = [...new Set(pricesForSelectedMarket.map(p => p.barangPasar.barang.namaBarang))]
-        .filter(name => popularItems.some(popular => name.toLowerCase().includes(popular.toLowerCase())))
-        .slice(0, 5);
+        .slice(0, 10);
         
-    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
+    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe','#00c49f', '#d0ed57', '#a28fd0', '#ff6f91', '#2f4f4f'];
     setChartLines(lineKeys.map((key, index) => ({ key, color: colors[index % colors.length] })));
 
   }, [selectedMarketId, allPrices]);

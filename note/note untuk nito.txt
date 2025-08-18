@@ -1,0 +1,27 @@
+Yang tak ubah/tambah di Backend
+
+/Backend/src/modul/Public
+
+/Backend/src/app.module.ts --> tak tambah public module Tapi rung bener kabeh backend e
+
+
+1. Membuat Endpoint Grafik Menjadi Publik
+Agar grafik tren harga di landing page bisa dilihat oleh masyarakat umum, kita perlu membuat endpoint yang menyediakannya menjadi publik (bisa diakses tanpa login).
+
+File yang perlu diubah: backend/src/modules/Kepokmas/harga-barang-grid/harga-barang-pasar.controller.ts
+
+Tindakan: Cukup tambahkan decorator @Public() di atas method findAll().
+
+2. Menambahkan Kolom Gambar (Image URL) pada Entitas
+Untuk menampilkan gambar di halaman "Daftar Pasar" dan nanti di detail harga, kita perlu menambahkan satu kolom baru di dua entitas utama.
+
+A. Pada nama_pasar.entity.ts:
+Tambahkan kolom imageUrl untuk menyimpan link gambar dari setiap pasar.|
+
+B. Pada nama_barang.entity.ts:
+Tambahkan juga kolom imageUrl untuk menyimpan link gambar dari setiap barang/komoditas.
+
+Penting: Setelah menambahkan kolom baru ini pada entity, 
+teman Anda perlu memastikan DTO (Data Transfer Object) untuk create dan update juga diperbarui agar bisa menerima
+
+imageUrl saat admin mengelola data. Database juga perlu disinkronkan untuk menambahkan kolom baru ini.
