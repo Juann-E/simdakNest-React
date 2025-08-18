@@ -13,3 +13,14 @@
             tanpa pasarId: semua pasar
             tanpa barangId: semua barangId
             tanpa param sama sekali: semua pasar dan semua barang
+
+19 agustus
+    1. 
+        ALTER TABLE nama_pasar ADD COLUMN gambar VARCHAR(255) NULL;
+    2 
+        12. npm install @nestjs/serve-static
+        13. npm install --save-dev @types/express @types/multer
+    3.
+        ALTER TABLE nama_barang 
+        ADD COLUMN gambar VARCHAR(255) NULL AFTER keterangan;
+    4. upload postman nya sudha di update untuk nama_barang dan nama_pasar

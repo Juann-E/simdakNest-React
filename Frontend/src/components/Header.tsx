@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 
-import { Link } from 'react-router-dom'; // <-- 1. Impor komponen Link
+import { Link } from 'react-router-dom';
 import { ChartColumn, TriangleAlert, Eye } from 'lucide-react';
 
 export default function Header() {

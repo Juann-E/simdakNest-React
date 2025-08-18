@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+
 export class CreateNamaPasarDto {
   @IsNotEmpty()
   @IsString()
@@ -7,4 +8,8 @@ export class CreateNamaPasarDto {
   @IsOptional()
   @IsString()
   alamat?: string;
+
+  @IsOptional()
+  @IsString()
+  gambar?: string; // path file setelah upload
 }

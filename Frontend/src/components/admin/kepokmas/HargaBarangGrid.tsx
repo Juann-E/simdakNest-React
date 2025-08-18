@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Table, PlusCircle, Search } from 'lucide-react'; // <-- Ganti Edit dengan PlusCircle
+import { Table, PlusCircle, Search } from 'lucide-react'; 
 
 interface Market {
   id: number;

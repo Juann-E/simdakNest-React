@@ -15,6 +15,9 @@ export class NamaPasar {
   @CreateDateColumn({ name: 'time_stamp' })
   time_stamp: Date;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  gambar: string;
+
   // Tambahan relasi
   @OneToMany(() => BarangPasarGrid, (grid) => grid.pasar)
   barangPasarGrid: BarangPasarGrid[];

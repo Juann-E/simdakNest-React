@@ -13,4 +13,8 @@ export class UpdateNamaBarangDto {
   @IsOptional()
   @IsString()
   keterangan?: string;
+
+  @IsOptional()
+  @IsString()
+  gambar?: string; 
 }

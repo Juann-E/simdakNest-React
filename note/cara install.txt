@@ -14,7 +14,10 @@ untuk backend
     9. npm install @nestjs/mapped-types
     10. npm install class-validator class-transformer
     11. npm install exceljs
-    
+    ------
+    12. npm install @nestjs/serve-static
+    13. npm install --save-dev @types/express @types/multer
+
 untuk migrating
     1. npx ts-node src/seeds/create-admin.seed.ts
         note: ganti create-admin.seed.ts dengan file yang ingin di migrate
@@ -25,6 +28,7 @@ untuk forntend
     2. typescript + swc
     3. npm install 
     4. yarn dev (untuk runnning)
-    ---------------------------
     5. npm install --global yarn
     6. yarn add -D @vitejs/plugin-react @types/react @types/react-dom
+    7. npm install react-select
+    8. yarn add react-select

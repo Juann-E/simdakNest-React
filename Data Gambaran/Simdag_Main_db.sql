@@ -18,7 +18,8 @@ CREATE TABLE nama_pasar (
     id_pasar INT AUTO_INCREMENT PRIMARY KEY,
     nama_pasar VARCHAR(100) NOT NULL,
     alamat TEXT,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    gambar VARCHAR(255) NULL
 );
 
 -- Tabel satuan_barang
@@ -34,6 +35,7 @@ CREATE TABLE nama_barang (
     nama_barang VARCHAR(100) NOT NULL,
     id_satuan INT NOT NULL,
     keterangan TEXT,
+    gambar VARCHAR(255), -- <--- kolom baru
     time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_satuan) REFERENCES satuan_barang(id_satuan)
         ON UPDATE CASCADE

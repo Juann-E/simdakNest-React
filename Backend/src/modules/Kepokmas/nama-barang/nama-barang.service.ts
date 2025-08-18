@@ -23,12 +23,12 @@ export class NamaBarangService {
         const barang = this.namaBarangRepo.create({
             namaBarang: dto.namaBarang,
             keterangan: dto.keterangan,
+            gambar: dto.gambar,
             satuan,
         });
 
         return this.namaBarangRepo.save(barang);
     }
-
     findAll() {
         return this.namaBarangRepo.find();
     }
@@ -50,6 +50,7 @@ export class NamaBarangService {
 
         if (dto.namaBarang !== undefined) barang.namaBarang = dto.namaBarang;
         if (dto.keterangan !== undefined) barang.keterangan = dto.keterangan;
+        if (dto.gambar !== undefined) barang.gambar = dto.gambar; // <-- update gambar
 
         return this.namaBarangRepo.save(barang);
     }

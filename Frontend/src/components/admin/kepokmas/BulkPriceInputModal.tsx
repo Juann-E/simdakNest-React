@@ -14,7 +14,7 @@ interface ModalProps {
   marketId: number;
   marketName: string;
   onSuccess: () => void;
-  latestPrices: Map<number, PriceData>; // <-- Terima prop baru
+  latestPrices: Map<number, PriceData>; 
 }
     
 export default function BulkPriceInputModal({ isOpen, onClose, marketId, marketName, onSuccess, latestPrices }: ModalProps) {

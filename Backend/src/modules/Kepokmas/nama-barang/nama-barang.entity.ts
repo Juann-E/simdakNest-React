@@ -10,17 +10,19 @@ export class NamaBarang {
   @Column({ name: 'nama_barang', type: 'varchar', length: 100 })
   namaBarang: string;
 
-  @ManyToOne(() => SatuanBarang, { eager: true }) // eager load satuan
+  @ManyToOne(() => SatuanBarang, { eager: true })
   @JoinColumn({ name: 'id_satuan' })
   satuan: SatuanBarang;
 
   @Column({ type: 'text', nullable: true })
   keterangan?: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true }) 
+  gambar?: string;
+
   @CreateDateColumn({ name: 'time_stamp' })
   createdAt: Date;
 
-  // Tambahkan relasi OneToMany ke BarangPasarGrid
   @OneToMany(() => BarangPasarGrid, (grid) => grid.barang)
   barangPasarGrid: BarangPasarGrid[];
 }

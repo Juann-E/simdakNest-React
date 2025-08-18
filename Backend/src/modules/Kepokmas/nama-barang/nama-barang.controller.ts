@@ -1,4 +1,10 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller, Get, Post, Patch, Delete, Param, Body,
+  UseGuards, UseInterceptors, UploadedFile
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { NamaBarangService } from './nama-barang.service';
 import { CreateNamaBarangDto } from './dto/create-nama-barang.dto';
 import { UpdateNamaBarangDto } from './dto/update-nama-barang.dto';
@@ -14,7 +20,17 @@ export class NamaBarangController {
 
   @Post()
   @Roles(UserRole.ADMIN)
-  create(@Body() dto: CreateNamaBarangDto) {
+  @UseInterceptors(FileInterceptor('gambar', {
+    storage: diskStorage({
+      destination: './uploads/barang',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname));
+      }
+    })
+  }))
+  create(@Body() dto: CreateNamaBarangDto, @UploadedFile() file?: Express.Multer.File) {
+    if (file) dto.gambar = file.path;
     return this.namaBarangService.create(dto);
   }
 
@@ -32,7 +48,17 @@ export class NamaBarangController {
 
   @Patch(':id')
   @Roles(UserRole.ADMIN)
-  update(@Param('id') id: number, @Body() dto: UpdateNamaBarangDto) {
+  @UseInterceptors(FileInterceptor('gambar', {
+    storage: diskStorage({
+      destination: './uploads/barang',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname));
+      }
+    })
+  }))
+  update(@Param('id') id: number, @Body() dto: UpdateNamaBarangDto, @UploadedFile() file?: Express.Multer.File) {
+    if (file) dto.gambar = file.path;
     return this.namaBarangService.update(+id, dto);
   }
 
