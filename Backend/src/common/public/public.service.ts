@@ -3,8 +3,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NamaPasar } from '../Kepokmas/nama-pasar/nama-pasar.entity';
-import { HargaBarangPasar } from '../Kepokmas/harga-barang-grid/harga-barang-pasar.entity';
+import { NamaPasar } from '../../modules/Kepokmas/nama-pasar/nama-pasar.entity';
+import { HargaBarangPasar } from '../../modules/Kepokmas/harga-barang-grid/harga-barang-pasar.entity';
 
 @Injectable()
 export class PublicService {
@@ -15,12 +15,27 @@ export class PublicService {
     private readonly hargaRepo: Repository<HargaBarangPasar>,
   ) {}
 
+  /**
+   * Mengambil semua data harga dengan relasi yang dibutuhkan oleh chart di frontend.
+   */
+  async findAllPrices(): Promise<HargaBarangPasar[]> {
+    return this.hargaRepo.find({
+      relations: ['barangPasar', 'barangPasar.pasar', 'barangPasar.barang'],
+      order: { time_stamp: 'DESC' }, // Mengurutkan untuk performa query yang lebih baik
+    });
+  }
+
+  /**
+   * Mengambil semua daftar pasar.
+   */
   async findAllMarkets(): Promise<NamaPasar[]> {
     return this.pasarRepo.find();
   }
 
+  /**
+   * Mengambil data harga hari ini dan kemarin untuk pasar tertentu.
+   */
   async findPricesForMarket(marketId: number) {
-    // ... (fungsi ini tidak berubah)
     const allPrices = await this.hargaRepo.find({
       where: { barangPasar: { pasar: { id: marketId } } },
       relations: ['barangPasar', 'barangPasar.barang', 'barangPasar.barang.satuan', 'barangPasar.pasar'],
@@ -50,26 +65,25 @@ export class PublicService {
     return Array.from(commodityMap.values());
   }
 
-  // --- FUNGSI INI DIPERBARUI TOTAL ---
+  /**
+   * Mengambil data yang sudah diproses untuk chart global (tanpa filter pasar).
+   */
   async getChartData() {
     const allPrices = await this.hargaRepo.find({
       relations: ['barangPasar', 'barangPasar.pasar', 'barangPasar.barang'],
-      order: { time_stamp: 'DESC' } // Ambil data terbaru dulu
+      order: { time_stamp: 'DESC' }
     });
 
     if (allPrices.length === 0) {
       return { chartData: [], chartLines: [] };
     }
 
-    // Ambil 7 hari unik terakhir dari data yang ada
     const recentDates = [...new Set(allPrices.map(p => p.tanggal_harga.toString().split('T')[0]))]
         .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
         .slice(0, 7).reverse();
 
-    // Saring harga hanya dari tanggal-tanggal tersebut
     const recentPrices = allPrices.filter(p => recentDates.includes(p.tanggal_harga.toString().split('T')[0]));
     
-    // Tentukan 5 barang teratas yang paling sering muncul di data terbaru
     const itemFrequency = new Map<string, number>();
     recentPrices.forEach(p => {
         const itemName = p.barangPasar?.barang?.namaBarang;
@@ -83,7 +97,6 @@ export class PublicService {
         .slice(0, 5)
         .map(entry => entry[0]);
 
-    // Kelompokkan data berdasarkan tanggal
     const groupedByDate: { [key: string]: any } = {};
     recentDates.forEach(date => {
       groupedByDate[date] = { day: new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };

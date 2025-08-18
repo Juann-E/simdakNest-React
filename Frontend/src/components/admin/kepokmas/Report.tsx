@@ -17,7 +17,7 @@ export default function Report() {
   const [gridData, setGridData] = useState<GridItem[]>([]);
   
   // State untuk form filter
-  const [selectedMarkets, setSelectedMarkets] = useState<SelectOption[]>([]);
+  const [selectedMarket, setSelectedMarket] = useState<SelectOption | null>(null);
   const [selectedItems, setSelectedItems] = useState<SelectOption[]>([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -48,17 +48,17 @@ export default function Report() {
 
   // Logika untuk dropdown dinamis
   const availableItems = useMemo(() => {
-    if (selectedMarkets.length === 0) {
+    if (!selectedMarket) {
       return allItems;
     }
-    const selectedMarketIds = new Set(selectedMarkets.map(m => m.value));
-    const itemIdsInSelectedMarkets = new Set(
+    const selectedMarketId = selectedMarket.value;
+    const itemIdsInSelectedMarket = new Set(
       gridData
-        .filter(grid => selectedMarketIds.has(grid.pasar.id))
+        .filter(grid => grid.pasar.id === selectedMarketId)
         .map(grid => grid.barang.id)
     );
-    return allItems.filter(item => itemIdsInSelectedMarkets.has(item.value));
-  }, [selectedMarkets, allItems, gridData]);
+    return allItems.filter(item => itemIdsInSelectedMarket.has(item.value));
+  }, [selectedMarket, allItems, gridData]);
 
   // Efek untuk membersihkan pilihan barang jika tidak lagi valid
   useEffect(() => {
@@ -67,16 +67,26 @@ export default function Report() {
         availableItems.some(available => available.value === selected.value)
       )
     );
-  }, [selectedMarkets, availableItems]);
+  }, [selectedMarket, availableItems]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!selectedMarket || selectedItems.length === 0 || !startDate || !endDate) {
+      alert('Mohon lengkapi semua field yang wajib diisi (Pasar, Barang, Tanggal Mulai, dan Tanggal Selesai).');
+      return;
+    }
+
     setIsLoading(true);
     const token = localStorage.getItem('accessToken');
 
+    // --- PERUBAHAN 1: Tambahkan namaPasar dan namaBarang ke payload ---
+    // Pastikan backend Anda diupdate untuk menerima properti 'namaPasar' dan 'namaBarang'
     const payload = {
-      pasarId: selectedMarkets.map(m => m.value),
+      pasarId: [selectedMarket.value],
+      namaPasar: selectedMarket.label, // Kirim nama pasar
       barangId: selectedItems.map(i => i.value),
+      namaBarang: selectedItems.map(i => i.label), // Kirim nama barang
       start: startDate,
       end: endDate,
     };
@@ -95,7 +105,12 @@ export default function Report() {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `report-${new Date().toISOString().split('T')[0]}.xlsx`);
+
+        // --- PERUBAHAN 2: Buat nama file lebih deskriptif ---
+        const marketNameForFile = selectedMarket.label.replace(/ /g, '_'); // Ganti spasi dengan underscore
+        const today = new Date().toISOString().split('T')[0];
+        link.setAttribute('download', `Laporan_${marketNameForFile}_${today}.xlsx`);
+        
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -111,20 +126,11 @@ export default function Report() {
     }
   };
   
-  const selectAllMarketsOption = { value: 0, label: '[ Pilih Semua Pasar ]' };
   const selectAllItemsOption = { value: 0, label: '[ Pilih Semua Barang Tersedia ]' };
 
-  const handleMarketChange = (selectedOptions: readonly SelectOption[]) => {
-    if (selectedOptions && selectedOptions.some(option => option.value === 0)) {
-      setSelectedMarkets(selectedMarkets.length === allMarkets.length ? [] : allMarkets);
-    } else {
-      setSelectedMarkets(selectedOptions as SelectOption[]);
-    }
-  };
-  
   const handleItemChange = (selectedOptions: readonly SelectOption[]) => {
     if (selectedOptions && selectedOptions.some(option => option.value === 0)) {
-       setSelectedItems(selectedItems.length === availableItems.length ? [] : availableItems);
+        setSelectedItems(selectedItems.length === availableItems.length ? [] : availableItems);
     } else {
       setSelectedItems(selectedOptions as SelectOption[]);
     }
@@ -139,13 +145,11 @@ export default function Report() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pasar/Toko</label>
           <Select
-            isMulti
-            options={[selectAllMarketsOption, ...allMarkets]}
-            value={selectedMarkets}
-            onChange={handleMarketChange}
-            placeholder="Pilih satu atau lebih pasar (kosongkan untuk semua)"
-            closeMenuOnSelect={false}
-            hideSelectedOptions={false}
+            options={allMarkets}
+            value={selectedMarket}
+            onChange={(option) => setSelectedMarket(option as SelectOption)}
+            placeholder="Pilih satu pasar"
+            isClearable
           />
         </div>
 
@@ -156,10 +160,10 @@ export default function Report() {
             options={[selectAllItemsOption, ...availableItems]}
             value={selectedItems}
             onChange={handleItemChange}
-            placeholder="Pilih pasar dulu, atau kosongkan untuk semua barang"
+            placeholder="Pilih pasar dulu"
             closeMenuOnSelect={false}
             hideSelectedOptions={false}
-            isDisabled={allItems.length === 0}
+            isDisabled={!selectedMarket}
           />
         </div>
 
@@ -193,7 +197,7 @@ export default function Report() {
             type="reset" 
             className="btn-secondary" 
             onClick={() => {
-              setSelectedMarkets([]);
+              setSelectedMarket(null);
               setSelectedItems([]);
               setStartDate('');
               setEndDate('');

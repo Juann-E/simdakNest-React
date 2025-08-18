@@ -12,7 +12,7 @@ import { NamaBarangModule } from './modules/Kepokmas/nama-barang/nama-barang.mod
 import { BarangPasarGridModule } from './modules/Kepokmas/barang-pasar-grid/barang-pasar-grid.module';
 import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/harga-barang-pasar.module';
 import { ReportModule } from './modules/Kepokmas/report/report.module';
-import { PublicModule } from './modules/public/public.module'; // <-- 1. Impor modul baru
+import { PublicModule } from './common/public/public.module'; // <-- 1. Impor modul baru
 
 @Module({
   providers: [
