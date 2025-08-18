@@ -1,4 +1,5 @@
 untuk backend
+    running-nya "npm start dev" atau pakai file bat nya
     1. masul ke backend
     2.  npm install -g @nestjs/cli
     3. nest ---version (untuk cek apakah sudah terinstall)
@@ -23,4 +24,7 @@ untuk forntend
     1.  npm create vite@latest . -- --template react-ts
     2. typescript + swc
     3. npm install 
-    4. npm run dev (untuk runnning)
+    4. yarn dev (untuk runnning)
+    ---------------------------
+    5. npm install --global yarn
+    6. yarn add -D @vitejs/plugin-react @types/react @types/react-dom
