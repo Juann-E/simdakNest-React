@@ -51,6 +51,7 @@ export class PublicService {
         commodityMap.set(itemName, {
           name: itemName,
           unit: p.barangPasar.barang.satuan?.satuanBarang || 'N/A',
+          gambar: p.barangPasar.barang.gambar,
           priceToday: 0,
           priceYesterday: 0,
         });

@@ -1,4 +1,7 @@
+// update-nama-barang.dto.ts
+
 import { IsOptional, IsString, MaxLength, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer'; // 1. Import 'Type'
 
 export class UpdateNamaBarangDto {
   @IsOptional()
@@ -7,6 +10,7 @@ export class UpdateNamaBarangDto {
   namaBarang?: string;
 
   @IsOptional()
+  @Type(() => Number) // 2. Tambahkan dekorator ini
   @IsNumber()
   idSatuan?: number;
 

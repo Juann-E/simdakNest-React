@@ -6,38 +6,50 @@ import HeroSection from '../components/HeroSection';
 import FeatureCarousel from '../components/FeatureCarousel';
 import MapSection from '../components/MapSection';
 import PriceChart from '../components/PriceChart';
+import { MapPin } from 'lucide-react';
 
+const API_BASE_URL = 'http://localhost:3000';
+
+// 1. Perbarui interface untuk menyertakan latitude dan longitude
 interface Market {
   id: number;
   nama_pasar: string;
   alamat: string;
+  gambar?: string;
   imageUrl?: string;
+  latitude?: number;
+  longitude?: number;
 }
-
-// Anda bisa menambahkan lebih banyak gambar di sini jika jumlah pasar bertambah
-const marketImages = {
-  1: '/pasar-raya.jpg',
-  2: '/pasar-blauran.jpg',
-  3: '/pasar-rejosari.jpg',
-  4: '/pasar-pagi.jpg',
-  5: '/pasar-jetis.jpg',
-};
 
 export default function MarketListPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // 2. Tambahkan state untuk melacak pasar yang dipilih di peta
+  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
 
   useEffect(() => {
     const fetchMarkets = async () => {
       setLoading(true);
       try {
-        // Mengambil data pasar dari endpoint publik
-        const response = await axios.get('http://localhost:3000/public/markets');
-        const marketsWithImages = response.data.map((market: Market) => ({
-          ...market,
-          imageUrl: marketImages[market.id] || '/default-market.jpg' // Memberi gambar default
-        }));
+        const response = await axios.get(`${API_BASE_URL}/public/markets`);
+        
+        const marketsWithImages = response.data.map((market: Market) => {
+          let imageUrl = '/default-market.jpg';
+          if (market.gambar) {
+            const cleanedPath = market.gambar.replace(/\\/g, '/').replace('uploads/', '');
+            imageUrl = `${API_BASE_URL}/${cleanedPath}`;
+          }
+          return { ...market, imageUrl };
+        });
+        
         setMarkets(marketsWithImages);
+
+        // 3. Set pasar pertama sebagai pilihan default saat data berhasil dimuat
+        if (marketsWithImages.length > 0) {
+          setSelectedMarket(marketsWithImages[0]);
+        }
+
       } catch (error) {
         console.error("Gagal mengambil data pasar:", error);
       } finally {
@@ -51,19 +63,50 @@ export default function MarketListPage() {
     <div className="space-y-12 pb-16">
       <HeroSection />
       <FeatureCarousel />
-      <MapSection />
-
+      
+      {/* --- BAGIAN PETA YANG DIPERBARUI --- */}
       <section className="container mx-auto px-4 sm:px-6">
+        <div className="text-center space-y-4 mb-12">
+          <h3 className="text-4xl font-bold text-gray-800">Peta Lokasi Pasar</h3>
+          <p className="text-xl text-gray-500 max-w-3xl mx-auto">
+            Pilih nama pasar di samping untuk melihat lokasinya di peta.
+          </p>
+        </div>
+        {/* 4. Buat layout 2 kolom untuk daftar pasar dan peta */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Kolom Daftar Pasar */}
+          <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-full max-h-[500px] overflow-y-auto">
+            <h4 className="text-2xl font-bold mb-4">Pilih Pasar</h4>
+            <ul className="space-y-2">
+              {markets.map(market => (
+                <li key={market.id}>
+                  <button 
+                    onClick={() => setSelectedMarket(market)}
+                    className={`w-full text-left p-3 rounded-lg transition-colors flex items-center ${selectedMarket?.id === market.id ? 'bg-blue-100 text-blue-800 font-semibold' : 'hover:bg-gray-100'}`}
+                  >
+                    <MapPin size={18} className="mr-3 flex-shrink-0" />
+                    {market.nama_pasar}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* Kolom Peta */}
+          <div className="lg:col-span-2">
+            {/* 5. Kirim data pasar dan pasar terpilih ke komponen MapSection */}
+            <MapSection markets={markets} selectedMarket={selectedMarket} />
+          </div>
+        </div>
+      </section>
+      {/* ------------------------------------ */}
+
+      <section className="container mx-auto px-4 sm:px-6 mt-16">
         <div className="text-center space-y-4 mb-12">
             <h3 className="text-4xl font-bold text-gray-800">Analisis Tren Harga Komoditas</h3>
             <p className="text-xl text-gray-500 max-w-3xl mx-auto">
                 Pilih pasar pada grafik di bawah untuk melihat tren harga
             </p>
         </div>
-        {/*
-          Panggil PriceChart tanpa props.
-          Komponen ini sekarang akan mengambil dan mengelola datanya sendiri.
-        */}
         <PriceChart />
       </section>
 
@@ -80,12 +123,12 @@ export default function MarketListPage() {
                 <Link to={`/market/${market.id}`} key={market.id} className="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <img src={market.imageUrl} alt={market.nama_pasar} className="w-full h-48 object-cover" />
                     <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{market.nama_pasar}</h2>
-                    <p className="text-sm text-gray-500 mb-4">{market.alamat}</p>
-                    <div className="flex items-center text-blue-600 font-semibold">
-                        <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full mr-3">Aktif</span>
-                        Lihat Harga Real-time →
-                    </div>
+                      <h2 className="text-2xl font-bold text-gray-800 mb-2">{market.nama_pasar}</h2>
+                      <p className="text-sm text-gray-500 mb-4">{market.alamat}</p>
+                      <div className="flex items-center text-blue-600 font-semibold">
+                          <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full mr-3">Aktif</span>
+                          Lihat Harga Real-time →
+                      </div>
                     </div>
                 </Link>
                 ))

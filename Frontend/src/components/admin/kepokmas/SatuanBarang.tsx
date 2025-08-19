@@ -1,8 +1,6 @@
-// src/components/admin/kepokmas/SatuanBarang.tsx
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { Weight, Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { Weight, Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
@@ -12,12 +10,13 @@ interface Unit {
   satuanBarang: string;
 }
 
+const ITEMS_PER_PAGE = 10; // Tentukan jumlah item per halaman
+
 export default function SatuanBarang() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // 1. State baru untuk menyimpan input pencarian
   const [searchTerm, setSearchTerm] = useState('');
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -25,6 +24,9 @@ export default function SatuanBarang() {
   const [formData, setFormData] = useState({ satuanBarang: '' });
 
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
+
+  // State baru untuk pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchUnits();
@@ -46,10 +48,23 @@ export default function SatuanBarang() {
     }
   };
 
-  // 2. Filter daftar satuan berdasarkan searchTerm
-  const filteredUnits = units.filter(unit =>
-    unit.satuanBarang.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Logika untuk memfilter dan memotong data untuk halaman saat ini
+  const filteredUnits = useMemo(() => 
+    units.filter(unit =>
+      unit.satuanBarang.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [units, searchTerm]);
+
+  const totalPages = Math.ceil(filteredUnits.length / ITEMS_PER_PAGE);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredUnits.slice(startIndex, endIndex);
+  }, [currentPage, filteredUnits]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleOpenCreateModal = () => {
     setEditingUnit(null);
@@ -122,7 +137,6 @@ export default function SatuanBarang() {
           </div>
         </div>
         
-        {/* 3. Tambahkan input search bar di sini */}
         <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input 
@@ -146,8 +160,8 @@ export default function SatuanBarang() {
                 {loading && <tr><td colSpan={2} className="text-center py-4">Memuat data...</td></tr>}
                 {error && <tr><td colSpan={2} className="text-center py-4 text-red-500">{error}</td></tr>}
                 
-                {/* 4. Tabel sekarang me-render 'filteredUnits' */}
-                {!loading && !error && filteredUnits.map((unit) => (
+                {/* Gunakan 'paginatedData' untuk me-render baris tabel */}
+                {!loading && !error && paginatedData.map((unit) => (
                     <tr key={unit.idSatuan}>
                       <td className="px-6 py-4 whitespace-nowrap font-medium">{unit.satuanBarang}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
@@ -157,8 +171,8 @@ export default function SatuanBarang() {
                     </tr>
                 ))}
 
-                {/* 5. Pesan jika hasil pencarian kosong */}
-                {!loading && filteredUnits.length === 0 && (
+                {/* Pesan jika hasil pencarian kosong */}
+                {!loading && paginatedData.length === 0 && (
                   <tr>
                     <td colSpan={2} className="text-center py-4 text-gray-500">
                       Tidak ada satuan yang cocok dengan pencarian Anda.
@@ -168,9 +182,33 @@ export default function SatuanBarang() {
             </tbody>
           </table>
         </div>
+
+        {/* Tambahkan komponen navigasi pagination di bawah tabel */}
+        {!loading && totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-gray-700">
+              Halaman <span className="font-semibold">{currentPage}</span> dari <span className="font-semibold">{totalPages}</span>
+            </span>
+            <div className="inline-flex items-center -space-x-px">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ... (Modal dan ConfirmationModal tetap sama) ... */}
       <Modal 
         isOpen={isFormModalOpen} 
         onClose={() => setIsFormModalOpen(false)} 

@@ -1,15 +1,17 @@
-// src/components/admin/kepokmas/HargaGridDetailPage.tsx
-    
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Plus, Edit, Trash2, Search, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import BulkPriceInputModal from './BulkPriceInputModal';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
 // Definisikan tipe data
-interface PriceData { id_harga: number; harga: number; tanggal_harga: string; }
+interface PriceData {
+  id_harga: number;
+  harga: number;
+  tanggal_harga: string;
+}
 interface PriceHistoryItem {
   id_harga: number;
   harga: number;
@@ -22,13 +24,15 @@ interface PriceHistoryItem {
   };
 }
 
+// 1. Tentukan jumlah item per halaman
+const ITEMS_PER_PAGE = 10;
+
 export default function HargaGridDetailPage() {
   const { marketId } = useParams<{ marketId: string }>();
   const [marketName, setMarketName] = useState('');
   const [priceHistory, setPriceHistory] = useState<PriceHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Pastikan state ini dideklarasikan dengan benar
   const [latestPriceMap, setLatestPriceMap] = useState<Map<number, PriceData>>(new Map());
 
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -37,6 +41,9 @@ export default function HargaGridDetailPage() {
   const [editingItem, setEditingItem] = useState<PriceHistoryItem | null>(null);
   const [formData, setFormData] = useState({ harga: '', tanggal_harga: '', keterangan: '' });
   const [searchTerm, setSearchTerm] = useState('');
+
+  // 2. Tambahkan state untuk pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
   const numericMarketId = parseInt(marketId || '0', 10);
 
@@ -87,13 +94,31 @@ export default function HargaGridDetailPage() {
     }
   }, [numericMarketId]);
 
-  const filteredPriceHistory = priceHistory.filter(item => {
-    const term = searchTerm.toLowerCase();
-    const itemName = item.barangPasar?.barang?.namaBarang.toLowerCase() || '';
-    const itemPrice = item.harga.toString();
-    const itemDate = new Date(item.tanggal_harga).toLocaleDateString('id-ID',{ day: '2-digit', month: '2-digit', year: 'numeric' });
-    return itemName.includes(term) || itemPrice.includes(term) || itemDate.includes(term);
-  });
+  // 3. Logika untuk memfilter data
+  const filteredPriceHistory = useMemo(() => 
+    priceHistory.filter(item => {
+      const term = searchTerm.toLowerCase();
+      if (!term) return true; // Tampilkan semua jika tidak ada pencarian
+      const itemName = item.barangPasar?.barang?.namaBarang.toLowerCase() || '';
+      const itemPrice = item.harga.toString();
+      const itemDate = new Date(item.tanggal_harga).toLocaleDateString('id-ID',{ day: '2-digit', month: '2-digit', year: 'numeric' });
+      return itemName.includes(term) || itemPrice.includes(term) || itemDate.includes(term);
+    }), [priceHistory, searchTerm]);
+  
+  // Hitung total halaman berdasarkan data yang sudah difilter
+  const totalPages = Math.ceil(filteredPriceHistory.length / ITEMS_PER_PAGE);
+
+  // Potong data untuk ditampilkan di halaman saat ini
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredPriceHistory.slice(startIndex, endIndex);
+  }, [currentPage, filteredPriceHistory]);
+
+  // Reset ke halaman 1 setiap kali filter pencarian berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
   
   const handleOpenEditModal = (item: PriceHistoryItem) => {
     setEditingItem(item);
@@ -175,8 +200,9 @@ export default function HargaGridDetailPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
               {loading && <tr><td colSpan={5} className="text-center py-4">Memuat data...</td></tr>}
-              {!loading && filteredPriceHistory.length === 0 && <tr><td colSpan={5} className="text-center py-4 text-gray-500">Belum ada riwayat harga untuk pasar ini.</td></tr>}
-              {!loading && filteredPriceHistory.map(item => (
+              {!loading && paginatedData.length === 0 && <tr><td colSpan={5} className="text-center py-4 text-gray-500">Tidak ada data yang ditemukan.</td></tr>}
+              {/* 4. Gunakan 'paginatedData' untuk me-render baris tabel */}
+              {!loading && paginatedData.map(item => (
                   <tr key={item.id_harga}>
                       <td className="px-6 py-4 font-medium">{item.barangPasar?.barang?.namaBarang || 'N/A'}</td>
                       <td className="px-6 py-4 text-gray-600">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.harga)}</td>
@@ -190,6 +216,31 @@ export default function HargaGridDetailPage() {
               ))}
           </tbody>
         </table>
+
+        {/* --- 5. Tambahkan komponen navigasi pagination di bawah tabel --- */}
+        {!loading && totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-gray-700">
+              Halaman <span className="font-semibold">{currentPage}</span> dari <span className="font-semibold">{totalPages}</span>
+            </span>
+            <div className="inline-flex items-center -space-x-px">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <BulkPriceInputModal 

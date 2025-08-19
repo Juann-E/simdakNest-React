@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Plus, Trash2, ArrowLeft, Search, Edit, Save } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, Search, Edit, Save, ChevronLeft, ChevronRight } from 'lucide-react';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
@@ -13,6 +13,8 @@ interface Unit { idSatuan: number; satuanBarang: string; }
 interface Item { id: number; namaBarang: string; satuan: Unit; }
 interface GridItem { id_barang_pasar: number; pasar: Market; barang: Item; keterangan?: string; }
 
+// 1. Tentukan jumlah item per halaman
+const ITEMS_PER_PAGE = 10;
 
 export default function GridDetailPage() {
   const { marketId } = useParams();
@@ -24,16 +26,16 @@ export default function GridDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GridItem | null>(null);
 
-  // State untuk form tambah barang
   const [selectedItemId, setSelectedItemId] = useState('');
   const [keterangan, setKeterangan] = useState('');
 
-  // State untuk search bar
   const [searchTerm, setSearchTerm] = useState('');
-
-  // State untuk mode edit inline
+  
   const [editingGridItemId, setEditingGridItemId] = useState<number | null>(null);
   const [editKeterangan, setEditKeterangan] = useState('');
+  
+  // 2. Tambahkan state untuk pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
   const numericMarketId = parseInt(marketId || '0', 10);
 
@@ -77,9 +79,24 @@ export default function GridDetailPage() {
     return allItems.filter(item => !existingItemIds.has(item.id));
   }, [allItems, gridItems]);
 
-  const filteredGridItems = gridItems.filter(item =>
-    item.barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 3. Logika untuk memfilter dan memotong data untuk halaman saat ini
+  const filteredGridItems = useMemo(() => 
+    gridItems.filter(item =>
+      item.barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [gridItems, searchTerm]);
+
+  const totalPages = Math.ceil(filteredGridItems.length / ITEMS_PER_PAGE);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredGridItems.slice(startIndex, endIndex);
+  }, [currentPage, filteredGridItems]);
+
+  // Reset ke halaman 1 setiap kali filter pencarian berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,9 +199,10 @@ export default function GridDetailPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
               {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
-              {!loading && filteredGridItems.length === 0 && <tr><td colSpan={4} className="text-center py-4 text-gray-500">{gridItems.length > 0 ? 'Barang tidak ditemukan.' : 'Belum ada barang di pasar ini.'}</td></tr>}
+              {!loading && paginatedData.length === 0 && <tr><td colSpan={4} className="text-center py-4 text-gray-500">{gridItems.length > 0 ? 'Barang tidak ditemukan.' : 'Belum ada barang di pasar ini.'}</td></tr>}
               
-              {!loading && filteredGridItems.map(item => (
+              {/* 4. Gunakan 'paginatedData' untuk me-render baris tabel */}
+              {!loading && paginatedData.map(item => (
                   <tr key={item.id_barang_pasar}>
                       <td className="px-6 py-4 font-medium">{item.barang.namaBarang}</td>
                       <td className="px-6 py-4 text-gray-500">{item.barang.satuan?.satuanBarang || 'N/A'}</td>
@@ -219,6 +237,31 @@ export default function GridDetailPage() {
               ))}
           </tbody>
         </table>
+
+        {/* --- 5. Tambahkan komponen navigasi pagination di bawah tabel --- */}
+        {!loading && totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-gray-700">
+              Halaman <span className="font-semibold">{currentPage}</span> dari <span className="font-semibold">{totalPages}</span>
+            </span>
+            <div className="inline-flex items-center -space-x-px">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`Tambah Barang ke ${marketName}`}>

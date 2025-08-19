@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Building, Search, Plus, Upload, Download, Edit, Trash2 } from 'lucide-react';
+import { Building, Search, Plus, Upload, Download, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
@@ -10,7 +10,18 @@ interface Market {
   id: number;
   nama_pasar: string;
   alamat: string;
+  gambar?: string;
 }
+
+const API_BASE_URL = 'http://localhost:3000';
+
+// 1. Tambahkan fungsi helper untuk membuat URL gambar yang benar
+const createImageUrl = (path?: string) => {
+  if (!path) return null;
+  // Hapus 'uploads/' dan ubah '\' menjadi '/'
+  const cleanedPath = path.replace(/\\/g, '/').replace('uploads/', '');
+  return `${API_BASE_URL}/${cleanedPath}`;
+};
 
 export default function NamaPasar() {
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -20,7 +31,10 @@ export default function NamaPasar() {
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingMarket, setEditingMarket] = useState<Market | null>(null);
+  
   const [formData, setFormData] = useState({ nama_pasar: '', alamat: '' });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [marketToDelete, setMarketToDelete] = useState<Market | null>(null);
 
@@ -33,7 +47,7 @@ export default function NamaPasar() {
     const token = localStorage.getItem('accessToken');
     if (!token) { setError("Autentikasi gagal."); setLoading(false); return; }
     try {
-      const response = await axios.get('http://localhost:3000/nama-pasar', {
+      const response = await axios.get(`${API_BASE_URL}/nama-pasar`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMarkets(response.data);
@@ -48,16 +62,36 @@ export default function NamaPasar() {
     market.nama_pasar.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleOpenCreateModal = () => {
-    setEditingMarket(null);
+  const resetFormState = () => {
     setFormData({ nama_pasar: '', alamat: '' });
+    setSelectedFile(null);
+    setImagePreview(null);
+    setEditingMarket(null);
+  }
+
+  const handleOpenCreateModal = () => {
+    resetFormState();
     setIsFormModalOpen(true);
   };
 
   const handleOpenEditModal = (market: Market) => {
+    resetFormState();
     setEditingMarket(market);
     setFormData({ nama_pasar: market.nama_pasar, alamat: market.alamat });
+    
+    // 2. Gunakan fungsi helper untuk pratinjau gambar di modal edit
+    setImagePreview(createImageUrl(market.gambar));
+
     setIsFormModalOpen(true);
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -65,14 +99,21 @@ export default function NamaPasar() {
     const token = localStorage.getItem('accessToken');
     if (!token) { alert("Sesi berakhir, silakan login kembali."); return; }
 
+    const data = new FormData();
+    data.append('nama_pasar', formData.nama_pasar);
+    data.append('alamat', formData.alamat);
+    if (selectedFile) {
+      data.append('gambar', selectedFile);
+    }
+
     const url = editingMarket 
-      ? `http://localhost:3000/nama-pasar/${editingMarket.id}` 
-      : 'http://localhost:3000/nama-pasar';
+      ? `${API_BASE_URL}/nama-pasar/${editingMarket.id}` 
+      : `${API_BASE_URL}/nama-pasar`;
 
     const method = editingMarket ? 'patch' : 'post';
 
     try {
-      const response = await axios[method](url, formData, {
+      const response = await axios[method](url, data, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -99,13 +140,11 @@ export default function NamaPasar() {
     if (!token) { alert("Sesi berakhir, silakan login kembali."); return; }
 
     try {
-      await axios.delete(`http://localhost:3000/nama-pasar/${marketToDelete.id}`, {
+      await axios.delete(`${API_BASE_URL}/nama-pasar/${marketToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       setMarkets(markets.filter(m => m.id !== marketToDelete.id));
       setMarketToDelete(null);
-
     } catch (err) {
       console.error("Gagal menghapus pasar:", err);
       alert("Gagal menghapus pasar.");
@@ -142,28 +181,41 @@ export default function NamaPasar() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
                 <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Pasar</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alamat</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                 </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
+                {/* 3. Perbaiki colSpan menjadi 4 */}
                 {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
                 {error && <tr><td colSpan={4} className="text-center py-4 text-red-500">{error}</td></tr>}
                 {!loading && !error && filteredMarkets.map((market) => (
                     <tr key={market.id}>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium">{market.nama_pasar}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{market.alamat}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Aktif</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <button onClick={() => handleOpenEditModal(market)} className="text-blue-600 hover:text-blue-900"><Edit size={16} /></button>
-                        <button onClick={() => handleOpenDeleteModal(market)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
-                    </td>
+                        <td className="px-6 py-4">
+                            {/* 4. Gunakan fungsi helper untuk gambar di tabel */}
+                            {market.gambar ? (
+                                <img 
+                                  src={createImageUrl(market.gambar) || ''} 
+                                  alt={market.nama_pasar}
+                                  className="h-12 w-12 rounded-md object-cover"
+                                />
+                            ) : (
+                                <div className="h-12 w-12 flex items-center justify-center bg-gray-100 rounded-md text-gray-400">
+                                  <ImageIcon size={24} />
+                                </div>
+                            )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium">{market.nama_pasar}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">{market.alamat}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <button onClick={() => handleOpenEditModal(market)} className="text-blue-600 hover:text-blue-900"><Edit size={16} /></button>
+                            <button onClick={() => handleOpenDeleteModal(market)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
+                        </td>
                     </tr>
                 ))}
+                {/* 5. Perbaiki colSpan menjadi 4 */}
                 {!loading && filteredMarkets.length === 0 && (
                     <tr><td colSpan={4} className="text-center py-4 text-gray-500">Tidak ada pasar yang cocok.</td></tr>
                 )}
@@ -177,36 +229,57 @@ export default function NamaPasar() {
         onClose={() => setIsFormModalOpen(false)} 
         title={editingMarket ? "Edit Pasar" : "Tambah Pasar Baru"}
       >
-        <form onSubmit={handleFormSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="market-name" className="block text-sm font-medium text-gray-700">Nama Pasar</label>
-              <input
-                type="text" id="market-name"
-                value={formData.nama_pasar}
-                onChange={(e) => setFormData({ ...formData, nama_pasar: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="market-address" className="block text-sm font-medium text-gray-700">Alamat</label>
-              <input
-                type="text" id="market-address"
-                value={formData.alamat}
-                onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                required
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex justify-end space-x-3">
-            <button type="button" onClick={() => setIsFormModalOpen(false)} className="btn-secondary">Batal</button>
-            <button type="submit" className="btn-primary">
-              {editingMarket ? "Simpan Perubahan" : "Tambah"}
-            </button>
-          </div>
-        </form>
+        {/* ... (Isi Form tidak perlu diubah) ... */}
+         <form onSubmit={handleFormSubmit}>
+           <div className="space-y-4">
+             <div>
+               <label htmlFor="market-name" className="block text-sm font-medium text-gray-700">Nama Pasar</label>
+               <input
+                 type="text" id="market-name"
+                 value={formData.nama_pasar}
+                 onChange={(e) => setFormData({ ...formData, nama_pasar: e.target.value })}
+                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                 required
+               />
+             </div>
+             <div>
+               <label htmlFor="market-address" className="block text-sm font-medium text-gray-700">Alamat</label>
+               <input
+                 type="text" id="market-address"
+                 value={formData.alamat}
+                 onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
+                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                 required
+               />
+             </div>
+             <div>
+                 <label htmlFor="market-image" className="block text-sm font-medium text-gray-700">Gambar Pasar</label>
+                 <div className="mt-2 flex items-center space-x-4">
+                     <div className="shrink-0">
+                         {imagePreview ? (
+                             <img src={imagePreview} alt="Pratinjau" className="h-16 w-16 object-cover rounded-md"/>
+                         ) : (
+                             <div className="h-16 w-16 flex items-center justify-center bg-gray-100 rounded-md text-gray-400">
+                                 <ImageIcon size={32} />
+                             </div>
+                         )}
+                     </div>
+                     <label className="block">
+                         <span className="sr-only">Pilih file</span>
+                         <input type="file" id="market-image" name="gambar" onChange={handleFileChange}
+                             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                         />
+                     </label>
+                 </div>
+             </div>
+           </div>
+           <div className="mt-6 flex justify-end space-x-3">
+             <button type="button" onClick={() => setIsFormModalOpen(false)} className="btn-secondary">Batal</button>
+             <button type="submit" className="btn-primary">
+               {editingMarket ? "Simpan Perubahan" : "Tambah"}
+             </button>
+           </div>
+         </form>
       </Modal>
 
       <ConfirmationModal 
