@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Building, Search, Plus, Upload, Download, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
-import Modal from '../../ui/Modal';
-import ConfirmationModal from '../../ui/ConfirmationModal';
+import Modal from '../../../ui/Modal';
+import ConfirmationModal from '../../../ui/ConfirmationModal';
 
 interface Market {
   id: number;

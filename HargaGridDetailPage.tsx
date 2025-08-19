@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowLeft, Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import BulkPriceInputModal from './BulkPriceInputModal';
-import Modal from '../../ui/Modal';
-import ConfirmationModal from '../../ui/ConfirmationModal';
+import Modal from '../../../ui/Modal';
+import ConfirmationModal from '../../../ui/ConfirmationModal';
 
 // Definisikan tipe data
 interface PriceData {
@@ -59,6 +59,7 @@ export default function HargaGridDetailPage() {
         axios.get('http://localhost:3000/harga-barang-pasar', { headers }),
       ]);
       
+      // cari tau m maalahnya kenapa
       const currentMarket = marketRes.data.find(m => m.id === numericMarketId);
       if (currentMarket) setMarketName(currentMarket.nama_pasar);
 

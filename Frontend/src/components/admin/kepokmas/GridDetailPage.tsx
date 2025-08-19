@@ -1,5 +1,5 @@
 // src/components/admin/kepokmas/GridDetailPage.tsx
-    
+
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -21,7 +21,7 @@ export default function GridDetailPage() {
   const [marketName, setMarketName] = useState('');
   const [gridItems, setGridItems] = useState<GridItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
-  
+
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GridItem | null>(null);
@@ -30,10 +30,10 @@ export default function GridDetailPage() {
   const [keterangan, setKeterangan] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const [editingGridItemId, setEditingGridItemId] = useState<number | null>(null);
   const [editKeterangan, setEditKeterangan] = useState('');
-  
+
   // 2. Tambahkan state untuk pagination
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -46,24 +46,24 @@ export default function GridDetailPage() {
         const token = localStorage.getItem('accessToken');
         if (!token) { setLoading(false); return; }
         const headers = { Authorization: `Bearer ${token}` };
-  
+
         try {
           const [marketRes, allItemsRes, gridRes] = await Promise.all([
-            axios.get('http://localhost:3000/nama-pasar', { headers }),
-            axios.get('http://localhost:3000/nama-barang', { headers }),
-            axios.post('http://localhost:3000/barang-pasar-grid/filter', { idPasar: numericMarketId }, { headers })
+            axios.get<Market[]>('http://localhost:3000/nama-pasar', { headers }),
+            axios.get<Item[]>('http://localhost:3000/nama-barang', { headers }),
+            axios.post<GridItem[]>('http://localhost:3000/barang-pasar-grid/filter', { idPasar: numericMarketId }, { headers })
               .catch(error => {
                 if (error.response && error.response.status === 404) { return { data: [] }; }
                 throw error;
               })
           ]);
-  
+
           const currentMarket = marketRes.data.find(m => m.id === numericMarketId);
           if (currentMarket) setMarketName(currentMarket.nama_pasar);
-          
+
           setAllItems(allItemsRes.data);
           setGridItems(gridRes.data);
-  
+
         } catch (error) {
           console.error("Gagal memuat data detail grid", error);
         } finally {
@@ -80,7 +80,7 @@ export default function GridDetailPage() {
   }, [allItems, gridItems]);
 
   // 3. Logika untuk memfilter dan memotong data untuk halaman saat ini
-  const filteredGridItems = useMemo(() => 
+  const filteredGridItems = useMemo(() =>
     gridItems.filter(item =>
       item.barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase())
     ), [gridItems, searchTerm]);
@@ -103,34 +103,34 @@ export default function GridDetailPage() {
     if (!selectedItemId) return;
     const token = localStorage.getItem('accessToken');
     try {
-        const response = await axios.post('http://localhost:3000/barang-pasar-grid', {
-            idPasar: numericMarketId,
-            idBarang: parseInt(selectedItemId),
-            keterangan: keterangan,
-        }, { headers: { Authorization: `Bearer ${token}` } });
-        
-        const newItemFullData = allItems.find(item => item.id === parseInt(selectedItemId));
-        if (newItemFullData) {
-            const newGridItem = { ...response.data, barang: newItemFullData, pasar: { id: numericMarketId, nama_pasar: marketName } };
-            setGridItems([...gridItems, newGridItem]);
-        }
-        setIsModalOpen(false);
-        setSelectedItemId('');
-        setKeterangan('');
+      const response = await axios.post('http://localhost:3000/barang-pasar-grid', {
+        idPasar: numericMarketId,
+        idBarang: parseInt(selectedItemId),
+        keterangan: keterangan,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+
+      const newItemFullData = allItems.find(item => item.id === parseInt(selectedItemId));
+      if (newItemFullData) {
+        const newGridItem = { ...response.data, barang: newItemFullData, pasar: { id: numericMarketId, nama_pasar: marketName } };
+        setGridItems([...gridItems, newGridItem]);
+      }
+      setIsModalOpen(false);
+      setSelectedItemId('');
+      setKeterangan('');
     } catch (error) {
-        alert("Gagal menambahkan barang. Mungkin barang sudah ada.");
+      alert("Gagal menambahkan barang. Mungkin barang sudah ada.");
     }
   };
-  
+
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
     const token = localStorage.getItem('accessToken');
     try {
-        await axios.delete(`http://localhost:3000/barang-pasar-grid/${itemToDelete.pasar.id}/${itemToDelete.barang.id}`, { headers: { Authorization: `Bearer ${token}` } });
-        setGridItems(gridItems.filter(i => i.id_barang_pasar !== itemToDelete.id_barang_pasar));
-        setItemToDelete(null);
+      await axios.delete(`http://localhost:3000/barang-pasar-grid/${itemToDelete.pasar.id}/${itemToDelete.barang.id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setGridItems(gridItems.filter(i => i.id_barang_pasar !== itemToDelete.id_barang_pasar));
+      setItemToDelete(null);
     } catch (error) {
-        alert("Gagal menghapus barang.");
+      alert("Gagal menghapus barang.");
     }
   };
 
@@ -148,9 +148,9 @@ export default function GridDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setGridItems(gridItems.map(item => 
-        item.id_barang_pasar === itemToUpdate.id_barang_pasar 
-          ? { ...item, keterangan: response.data.keterangan } 
+      setGridItems(gridItems.map(item =>
+        item.id_barang_pasar === itemToUpdate.id_barang_pasar
+          ? { ...item, keterangan: response.data.keterangan }
           : item
       ));
 
@@ -174,20 +174,20 @@ export default function GridDetailPage() {
             <h2 className="text-xl font-bold text-gray-800">Daftar Barang: {marketName}</h2>
             <p className="text-sm text-gray-500">Kelola barang yang tersedia untuk pasar ini</p>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className="btn-primary"><Plus size={16} className="mr-2"/>Tambah Barang</button>
+          <button onClick={() => setIsModalOpen(true)} className="btn-primary"><Plus size={16} className="mr-2" />Tambah Barang</button>
         </div>
 
         <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Cari barang di pasar ini..." 
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Cari barang di pasar ini..."
+            className="w-full pl-10 pr-4 py-2 border rounded-lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        
+
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -198,43 +198,43 @@ export default function GridDetailPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-              {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
-              {!loading && paginatedData.length === 0 && <tr><td colSpan={4} className="text-center py-4 text-gray-500">{gridItems.length > 0 ? 'Barang tidak ditemukan.' : 'Belum ada barang di pasar ini.'}</td></tr>}
-              
-              {/* 4. Gunakan 'paginatedData' untuk me-render baris tabel */}
-              {!loading && paginatedData.map(item => (
-                  <tr key={item.id_barang_pasar}>
-                      <td className="px-6 py-4 font-medium">{item.barang.namaBarang}</td>
-                      <td className="px-6 py-4 text-gray-500">{item.barang.satuan?.satuanBarang || 'N/A'}</td>
-                      <td className="px-6 py-4 text-gray-500 w-1/3">
-                        {editingGridItemId === item.id_barang_pasar ? (
-                          <input
-                            type="text"
-                            value={editKeterangan}
-                            onChange={(e) => setEditKeterangan(e.target.value)}
-                            className="px-2 py-1 border rounded-md w-full"
-                            autoFocus
-                          />
-                        ) : (
-                          item.keterangan || '-'
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          {editingGridItemId === item.id_barang_pasar ? (
-                            <button onClick={() => handleSaveKeterangan(item)} className="text-green-600 hover:text-green-900" title="Simpan">
-                              <Save size={16} />
-                            </button>
-                          ) : (
-                            <button onClick={() => handleOpenEditMode(item)} className="text-blue-600 hover:text-blue-900" title="Edit Keterangan">
-                              <Edit size={16} />
-                            </button>
-                          )}
-                          <button onClick={() => setItemToDelete(item)} className="text-red-600 hover:text-red-900" title="Hapus Barang dari Pasar">
-                            <Trash2 size={16} />
-                          </button>
-                      </td>
-                  </tr>
-              ))}
+            {loading && <tr><td colSpan={4} className="text-center py-4">Memuat data...</td></tr>}
+            {!loading && paginatedData.length === 0 && <tr><td colSpan={4} className="text-center py-4 text-gray-500">{gridItems.length > 0 ? 'Barang tidak ditemukan.' : 'Belum ada barang di pasar ini.'}</td></tr>}
+
+            {/* 4. Gunakan 'paginatedData' untuk me-render baris tabel */}
+            {!loading && paginatedData.map(item => (
+              <tr key={item.id_barang_pasar}>
+                <td className="px-6 py-4 font-medium">{item.barang.namaBarang}</td>
+                <td className="px-6 py-4 text-gray-500">{item.barang.satuan?.satuanBarang || 'N/A'}</td>
+                <td className="px-6 py-4 text-gray-500 w-1/3">
+                  {editingGridItemId === item.id_barang_pasar ? (
+                    <input
+                      type="text"
+                      value={editKeterangan}
+                      onChange={(e) => setEditKeterangan(e.target.value)}
+                      className="px-2 py-1 border rounded-md w-full"
+                      autoFocus
+                    />
+                  ) : (
+                    item.keterangan || '-'
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  {editingGridItemId === item.id_barang_pasar ? (
+                    <button onClick={() => handleSaveKeterangan(item)} className="text-green-600 hover:text-green-900" title="Simpan">
+                      <Save size={16} />
+                    </button>
+                  ) : (
+                    <button onClick={() => handleOpenEditMode(item)} className="text-blue-600 hover:text-blue-900" title="Edit Keterangan">
+                      <Edit size={16} />
+                    </button>
+                  )}
+                  <button onClick={() => setItemToDelete(item)} className="text-red-600 hover:text-red-900" title="Hapus Barang dari Pasar">
+                    <Trash2 size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -265,35 +265,35 @@ export default function GridDetailPage() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`Tambah Barang ke ${marketName}`}>
-          <form onSubmit={handleAddItem} className="space-y-4">
-              <div>
-                <label htmlFor="item-select" className="block text-sm font-medium text-gray-700">Pilih Barang</label>
-                <select id="item-select" value={selectedItemId} onChange={e => setSelectedItemId(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-                    <option value="" disabled>-- Pilih Barang untuk Ditambahkan --</option>
-                    {availableItemsToAdd.map(item => (
-                        <option key={item.id} value={item.id}>{item.namaBarang} ({item.satuan.satuanBarang})</option>
-                    ))}
-                </select>
-                {availableItemsToAdd.length === 0 && <p className="text-xs text-gray-500 mt-1">Semua barang sudah ditambahkan ke pasar ini.</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="item-keterangan" className="block text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
-                <textarea id="item-keterangan" value={keterangan} onChange={e => setKeterangan(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" rows={3}></textarea>
-              </div>
+        <form onSubmit={handleAddItem} className="space-y-4">
+          <div>
+            <label htmlFor="item-select" className="block text-sm font-medium text-gray-700">Pilih Barang</label>
+            <select id="item-select" value={selectedItemId} onChange={e => setSelectedItemId(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+              <option value="" disabled>-- Pilih Barang untuk Ditambahkan --</option>
+              {availableItemsToAdd.map(item => (
+                <option key={item.id} value={item.id}>{item.namaBarang} ({item.satuan.satuanBarang})</option>
+              ))}
+            </select>
+            {availableItemsToAdd.length === 0 && <p className="text-xs text-gray-500 mt-1">Semua barang sudah ditambahkan ke pasar ini.</p>}
+          </div>
 
-              <div className="pt-2 flex justify-end space-x-3">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Batal</button>
-                  <button type="submit" className="btn-primary" disabled={availableItemsToAdd.length === 0}>Tambah</button>
-              </div>
-          </form>
+          <div>
+            <label htmlFor="item-keterangan" className="block text-sm font-medium text-gray-700">Keterangan (Opsional)</label>
+            <textarea id="item-keterangan" value={keterangan} onChange={e => setKeterangan(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" rows={3}></textarea>
+          </div>
+
+          <div className="pt-2 flex justify-end space-x-3">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Batal</button>
+            <button type="submit" className="btn-primary" disabled={availableItemsToAdd.length === 0}>Tambah</button>
+          </div>
+        </form>
       </Modal>
 
       <ConfirmationModal isOpen={!!itemToDelete} onClose={() => setItemToDelete(null)} onConfirm={handleConfirmDelete}
-          title="Konfirmasi Hapus"
-          message={`Hapus barang "${itemToDelete?.barang.namaBarang}" dari pasar "${itemToDelete?.pasar.nama_pasar}"?`} />
+        title="Konfirmasi Hapus"
+        message={`Hapus barang "${itemToDelete?.barang.namaBarang}" dari pasar "${itemToDelete?.pasar.nama_pasar}"?`} />
     </>
   );
 }

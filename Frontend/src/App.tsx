@@ -7,11 +7,13 @@ import MarketDetailPage from './pages/MarketDetailPage';
 import LoginPage from './pages/LoginPage';
 import Sidebar from './components/admin/Sidebar';
 import DashboardPage from './pages/admin/DashboardPage';
-import Header from './components/Header'; 
+import Header from './components/Header';
 import KepokmasPage from './pages/admin/KepokmasPage';
-// Impor komponen baru untuk halaman detail
 import GridDetailPage from './components/admin/kepokmas/GridDetailPage';
-import HargaGridDetailPage from './components/admin/kepokmas/HargaGridDetailPage';
+import HargaGridDetailPage from './components/admin/kepokmas/harga_barang_grid/HargaGridDetailPage';
+
+// ## PATH IMPOR YANG SUDAH DIPERBAIKI ##
+import InputHargaPage from './components/admin/kepokmas/harga_barang_grid/InputHargaPage';
 
 // ==========================================================
 // ## KOMPONEN BARU UNTUK LAYOUT PUBLIK ##
@@ -20,7 +22,7 @@ function PublicLayout() {
     <div>
       <Header />
       {/* Outlet akan merender halaman publik (MarketListPage, dll) */}
-      <Outlet /> 
+      <Outlet />
     </div>
   );
 }
@@ -62,18 +64,21 @@ function App() {
       {/* Rute Admin yang Terproteksi */}
       <Route path="/admin" element={<ProtectedRoute />}>
         <Route path="dashboard" element={<DashboardPage />} />
-        
+
         {/* Rute baru yang lebih fleksibel untuk Kepokmas */}
         <Route path="kepokmas/:tab" element={<KepokmasPage />} />
-        
-        {/* TAMBAHKAN RUTE BARU DI SINI */}
+
+        {/* Rute untuk halaman detail dan input */}
         <Route path="kepokmas/barang-pasar-grid/:marketId" element={<GridDetailPage />} />
         <Route path="kepokmas/harga-barang-grid/:marketId" element={<HargaGridDetailPage />} />
 
+        {/* Rute baru untuk halaman input */}
+        <Route path="/admin/kepokmas/input-harga/:marketId" element={<InputHargaPage />} />
+
         {/* Tambahkan redirect agar /admin/kepokmas otomatis ke tab pertama */}
-        <Route 
-          path="kepokmas" 
-          element={<Navigate to="/admin/kepokmas/nama-pasar" replace />} 
+        <Route
+          path="kepokmas"
+          element={<Navigate to="/admin/kepokmas/nama-pasar" replace />}
         />
       </Route>
     </Routes>

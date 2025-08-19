@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Weight, Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-import Modal from '../../ui/Modal';
-import ConfirmationModal from '../../ui/ConfirmationModal';
+import Modal from '../../../ui/Modal';
+import ConfirmationModal from '../../../ui/ConfirmationModal';
 
 // Definisikan tipe data untuk satu satuan, sesuai dengan Entity Anda
 interface Unit {

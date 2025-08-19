@@ -14,7 +14,19 @@ export default function Sidebar() {
   const isKepokmasActive = location.pathname.startsWith('/admin/kepokmas');
 
   const handleLogout = () => {
+    // Hapus token otentikasi
     localStorage.removeItem('accessToken');
+    
+    // Hapus semua data input harga yang tersimpan sementara di browser
+    // Logika ini akan mencari semua key di localStorage yang diawali dengan 'priceInput_market_'
+    // dan menghapusnya satu per satu.
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('priceInput_market_')) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    // Arahkan kembali ke halaman login
     navigate('/login');
   };
 
@@ -75,7 +87,6 @@ export default function Sidebar() {
 
       </nav>
       <div className="p-4 border-t mt-auto">
-        {/* ... (bagian profil dan logout tetap sama) ... */}
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-yellow-900">A</div>
           <div className="ml-3"><p className="font-semibold text-gray-800">Administrator</p><p className="text-xs text-gray-500">admin@salatiga.go.id</p></div>

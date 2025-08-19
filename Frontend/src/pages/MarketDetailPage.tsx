@@ -6,6 +6,11 @@ import { TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
 
 const API_BASE_URL = 'http://localhost:3000';
 
+interface Market {
+  id: number;
+  nama_pasar: string;
+}
+
 interface CommodityData {
   name: string;
   unit: string;
@@ -37,13 +42,15 @@ export default function MarketDetailPage() {
     const fetchDetailData = async () => {
       setLoading(true);
       try {
-        const marketRes = await axios.get(`${API_BASE_URL}/public/markets`);
+        // const marketRes = await axios.get(`${API_BASE_URL}/public/markets`);
+        const marketRes = await axios.get<Market[]>(`${API_BASE_URL}/public/markets`);
         const currentMarket = marketRes.data.find(m => m.id === numericMarketId);
         if (currentMarket) {
           setMarketName(currentMarket.nama_pasar);
         }
 
-        const pricesRes = await axios.get(`${API_BASE_URL}/public/prices/market/${numericMarketId}`);
+        // const pricesRes = await axios.get(`${API_BASE_URL}/public/prices/market/${numericMarketId}`);
+        const pricesRes = await axios.get<CommodityData[]>(`${API_BASE_URL}/public/prices/market/${numericMarketId}`);
         setCommodityList(pricesRes.data);
 
       } catch (error) {

@@ -32,8 +32,5 @@ untuk forntend
     6. yarn add -D @vitejs/plugin-react @types/react @types/react-dom
     7. npm install react-select
     8. yarn add react-select
-
-    --Baru-- Untuk fitur Mapnya
-
     9. npm install react-leaflet leaflet
     10. npm install -D @types/leaflet

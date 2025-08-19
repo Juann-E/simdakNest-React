@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Package, Search, Plus, Edit, Trash2, Image as ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import Modal from '../../ui/Modal';
-import ConfirmationModal from '../../ui/ConfirmationModal';
+import Modal from '../../../ui/Modal';
+import ConfirmationModal from '../../../ui/ConfirmationModal';
 
 interface Unit {
   idSatuan: number;
