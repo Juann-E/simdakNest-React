@@ -19,7 +19,9 @@ CREATE TABLE nama_pasar (
     nama_pasar VARCHAR(100) NOT NULL,
     alamat TEXT,
     time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    gambar VARCHAR(255) NULL
+    gambar VARCHAR(255) NULL,
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL
 );
 
 -- Tabel satuan_barang

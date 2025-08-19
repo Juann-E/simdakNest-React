@@ -12,4 +12,9 @@ export class CreateNamaPasarDto {
   @IsOptional()
   @IsString()
   gambar?: string; // path file setelah upload
+
+  @IsOptional()
+  @IsString()
+  koordinat?: string;
+
 }

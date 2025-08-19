@@ -12,8 +12,27 @@ export class NamaPasarService {
     private namaPasarRepo: Repository<NamaPasar>,
   ) {}
 
+  private dmsToDecimal(dms: string): number {
+    const regex = /(\d+)°(\d+)'([\d.]+)"?([NSEW])/;
+    const match = dms.match(regex);
+    if (!match) throw new Error(`Format koordinat tidak valid: ${dms}`);
+
+    const [, deg, min, sec, dir] = match;
+    let decimal = Number(deg) + Number(min) / 60 + Number(sec) / 3600;
+    if (dir === 'S' || dir === 'W') decimal *= -1;
+    return decimal;
+  }
+
   async create(dto: CreateNamaPasarDto): Promise<NamaPasar> {
     const pasar = this.namaPasarRepo.create(dto);
+
+    // parsing koordinat jika ada
+    if (dto.koordinat) {
+      const [latStr, lngStr] = dto.koordinat.split(' ');
+      pasar.latitude = this.dmsToDecimal(latStr);
+      pasar.longitude = this.dmsToDecimal(lngStr);
+    }
+
     return this.namaPasarRepo.save(pasar);
   }
 
@@ -30,6 +49,13 @@ export class NamaPasarService {
   async update(id: number, dto: UpdateNamaPasarDto): Promise<NamaPasar> {
     const pasar = await this.findOne(id);
     Object.assign(pasar, dto);
+
+    if (dto.koordinat) {
+      const [latStr, lngStr] = dto.koordinat.split(' ');
+      pasar.latitude = this.dmsToDecimal(latStr);
+      pasar.longitude = this.dmsToDecimal(lngStr);
+    }
+
     return this.namaPasarRepo.save(pasar);
   }
 

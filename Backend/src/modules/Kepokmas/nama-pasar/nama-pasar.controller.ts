@@ -16,7 +16,7 @@ import { UserRole } from '../../../common/enums/user-role.enum';
 @Controller('nama-pasar')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class NamaPasarController {
-  constructor(private readonly namaPasarService: NamaPasarService) { }
+  constructor(private readonly namaPasarService: NamaPasarService) {}
 
   @Post()
   @Roles(UserRole.ADMIN) // hanya admin

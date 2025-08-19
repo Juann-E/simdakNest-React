@@ -1,26 +1,59 @@
-18 agustus 2025
+1. 
+    ALTER TABLE nama_pasar
+    ADD latitude DECIMAL(10, 7) NULL,
+    ADD longitude DECIMAL(10, 7) NULL;
 
-    1.  npm install exceljs
+2. ini untuk yang aku cek jadi aku pengenya ketika di klik nanti langsung masuk ke 
+    google maps jadi otomatis dan waktu inputnya kita gak usah ngasig longitude dan langtitude
+    jjadi cuman kasih koordinat.
+    langsung "7°19'31.1"S 110°30'14.0"E" tidak usah repot repot misahin usernya
 
-    2. postman report yang belakangnya tulisan excel itu download file excel
-    3. 
+        1. **Input format koordinat**
+        Misalnya kamu punya input `7°19'31.1"S 110°30'14.0"E`. Itu sebenarnya terdiri dari dua bagian:
+
+        * **Latitude**: `7°19'31.1"S`
+        * **Longitude**: `110°30'14.0"E`
+
+        2. **Parsing / Memisahkan**
+        Dari string input, kita perlu memisahkan antara latitude dan longitude. Umumnya dipisah dengan spasi.
+
+        * `7°19'31.1"S` → latitude
+        * `110°30'14.0"E` → longitude
+
+        3. **Konversi ke format decimal**
+        Google Maps lebih gampang dibuka kalau koordinatnya pakai format **decimal degrees**, bukan format derajat-menit-detik (DMS).
+        Misalnya `7°19'31.1"S` akan dikonversi ke:
+
+        ```
+        7 + (19/60) + (31.1/3600) = 7.3253
+        Karena ada "S" → jadi -7.3253
+        ```
+
+        Untuk longitude sama, kalau ada "E" → positif, kalau "W" → negatif.
+
+        4. **Buka Google Maps**
+        Setelah kita punya koordinat decimal, kita bisa susun URL:
+
+        ```
+        https://www.google.com/maps?q=-7.3253,110.5039
+        ```
+3.  cara input postman gini
+    | Key          | Value                               | Type |
+    | ------------ | ----------------------------------- | ---- |
+    | `nama_pasar` | Pasar Baru                          | Text |
+    | `alamat`     | Jl. Malioboro                       | Text |
+    | `gambar`     | pilih file gambar (misal pasar.jpg) | File |
+    | `koordinat`  | 7°19'31.1"S 110°30'14.0"E           | Text |
+
+    nanti hasilnya
         {
-        "start": "2025-08-15",
-        "end": "2025-08-17",
-        "pasarId": [6,7],
-        "barangId": [15,16]
+            "id": 10,
+            "nama_pasar": "pasar gambar",
+            "alamat": "p,gambar 1",
+            "time_stamp": "2025-08-19T10:33:45.310Z",
+            "gambar": null,
+            "latitude": -7.3253055555555555,
+            "longitude": 110.5038888888889
         }
-            tanpa pasarId: semua pasar
-            tanpa barangId: semua barangId
-            tanpa param sama sekali: semua pasar dan semua barang
 
-19 agustus
-    1. 
-        ALTER TABLE nama_pasar ADD COLUMN gambar VARCHAR(255) NULL;
-    2 
-        12. npm install @nestjs/serve-static
-        13. npm install --save-dev @types/express @types/multer
-    3.
-        ALTER TABLE nama_barang 
-        ADD COLUMN gambar VARCHAR(255) NULL AFTER keterangan;
-    4. upload postman nya sudha di update untuk nama_barang dan nama_pasar
+4.  frontend sudah ku kasih file .bat

@@ -18,6 +18,12 @@ export class NamaPasar {
   @Column({ type: 'varchar', length: 255, nullable: true })
   gambar: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude: number;
+
   // Tambahan relasi
   @OneToMany(() => BarangPasarGrid, (grid) => grid.pasar)
   barangPasarGrid: BarangPasarGrid[];
