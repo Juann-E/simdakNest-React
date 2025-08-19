@@ -45,4 +45,38 @@ database kepokmas
         
 
 
-database
+database SPBU
+
+    Kecamatan
+        id_kecamatan (pk)
+        nama Kecamatan
+        keterangan
+
+    kelurahan
+        id_kelurahan (pk)
+        id_kecamatan (fk)
+        nama kelurahan
+        keterangan
+
+    SPBU
+        id_SPBU (PK)
+        no_SPBU 
+        nama kecamatan (fk)
+        nama kelurahan (fk)
+        alamat
+        LATITUDE
+        LONGTITUDE
+        telepon
+        penanggung jawab
+        akta_pendirian
+        akta_perubahan
+        keterangan akta
+        
+
+    Agen
+        id_agen (pk)
+        nama kecamatan (fk)
+        nama kelurahan (fk)
+        alamat
+        telepon
+        penanggung jawab
