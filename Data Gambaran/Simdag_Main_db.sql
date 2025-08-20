@@ -114,7 +114,6 @@ CREATE TABLE kelurahan (
       ON DELETE CASCADE
 );
 
-
 -- table spbu
 CREATE TABLE spbu (
     id_spbu INT AUTO_INCREMENT PRIMARY KEY,

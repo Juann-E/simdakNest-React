@@ -27,7 +27,7 @@ import { KelurahanModule } from './modules/Alamat/Kelurahan/kelurahan.module';
 
 // SPBU_LPG Modules
 import { SpbuModule } from './modules/SPBU_LPG/SPBU/main/spbu.module';
-
+import { RefDokuSpbuModule } from './modules/SPBU_LPG/SPBU/refrensi_doku_spbu/ref-doku-spbu.module';
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
 
@@ -78,7 +78,7 @@ import { PublicModule } from './common/public/public.module';
 
     // SPBU_LPG Module
     SpbuModule,
-
+    RefDokuSpbuModule,
     // Public access module
     PublicModule,
   ],

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Kecamatan } from '../../Alamat/Kecamatan/kecamatan.entity';
-import { Kelurahan } from '../../Alamat/Kelurahan/kelurahan.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn ,OneToMany} from 'typeorm';
+import { Kecamatan } from '../../../Alamat/Kecamatan/kecamatan.entity';
+import { Kelurahan } from '../../../Alamat/Kelurahan/kelurahan.entity';
+import { DokumenSpbu } from '../dokumen_spbu/dokumen-spbu.entity';
 
 @Entity('spbu')
 export class Spbu {
@@ -39,4 +40,8 @@ export class Spbu {
   @ManyToOne(() => Kelurahan)
   @JoinColumn({ name: 'id_kelurahan' })
   kelurahan: Kelurahan;
+
+  //dokumen_spbu
+  @OneToMany(() => DokumenSpbu, dok => dok.spbu, { cascade: true })
+  dokumen: DokumenSpbu[];
 }
