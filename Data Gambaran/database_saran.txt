@@ -68,10 +68,21 @@ database SPBU
         LONGTITUDE
         telepon
         penanggung jawab
+    
+    dokumen SPBU
+        id_dokumenSPBU (pk)
+        id_spbu (fk)
+        id_ref_dSPBU
+        file path
         akta_pendirian
         akta_perubahan
         keterangan akta
-        
+
+    ref_dokuSPBU
+        id_ref_dSPBU (pk)
+        id_dokumenSPBU (fk)
+        nama_jenis_dok
+
 
     Agen
         id_agen (pk)
