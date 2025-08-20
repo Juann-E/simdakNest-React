@@ -25,6 +25,9 @@ import { ReportModule } from './modules/Kepokmas/report/report.module';
 import { KecamatanModule } from './modules/Alamat/Kecamatan/kecamatan.module';
 import { KelurahanModule } from './modules/Alamat/Kelurahan/kelurahan.module';
 
+// SPBU_LPG Modules
+import { SpbuModule } from './modules/SPBU_LPG/SPBU/spbu.module';
+
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
 
@@ -72,6 +75,10 @@ import { PublicModule } from './common/public/public.module';
     // Alamat Modules
     KecamatanModule,
     KelurahanModule,
+
+    // SPBU_LPG Module
+    SpbuModule,
+
     // Public access module
     PublicModule,
   ],
