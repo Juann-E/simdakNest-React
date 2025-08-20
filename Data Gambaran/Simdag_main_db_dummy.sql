@@ -2,23 +2,49 @@ INSERT INTO users (username, password, role) VALUES
 ('admin1', '123', 'admin'),
 ('operator1', '123', 'operator');
 
-INSERT INTO nama_pasar (nama_pasar, alamat) VALUES
-('Pasar Pagi', 'Jl. Mawar No. 1'),
-('Pasar Malam', 'Jl. Melati No. 2');
+-- isi table ref_doku_spbu
+INSERT INTO ref_doku_spbu (nama_jenis_dok) VALUES
+('Akte Pendirian'),
+('Akte Perubahan'),
+('Peta Lokasi Pendirian SPBU'),
+('Peta Konstruksi SPBU'),
+('Kapasitas Penyimpanan dan Penimbunan'),
+('Perkiraan Penyaluran'),
+('Inventarisasi Peralatan dan Fasilitas'),
+('Rekomendasi dari Pertamina'),
+('Salinan KTP Penanggung Jawab SPBU'),
+('Salinan NPWP'),
+('Dokumen HO/AMDAL/UKL-UPL'),
+('Ijin Peruntukan Penggunaan Tanah (IPPT)'),
+('Ijin Mendirikan Bangunan (IMB)'),
+('Bukti Pengesahan Meter Pompa SPBU'),
+('Ijin Timbun Tangki dari Instansi Berwenang');
 
-INSERT INTO satuan_barang (satuan_barang) VALUES
-('Kilogram'),
-('Lembar');
+-- isi tabel kecamatan
+INSERT INTO kecamatan (nama_kecamatan, keterangan) VALUES
+('Argomulyo', 'Wilayah Argomulyo'),
+('Sidomukti', 'Wilayah Sidomukti'),
+('Sidorejo', 'Wilayah Sidorejo'),
+('Tingkir', 'Wilayah Tingkir');
 
-INSERT INTO nama_barang (nama_barang, id_satuan, keterangan) VALUES
-('Beras Premium', 1, 'Beras kualitas tinggi'),
-('Kertas HVS', 2, 'Kertas ukuran A4');
+-- isi tabel kelurahan
+INSERT INTO kelurahan (id_kecamatan, nama_kelurahan, keterangan) VALUES
+-- Argomulyo (id_kecamatan = 1)
+(1, 'Cebongan', 'Kelurahan di Argomulyo'),
+(1, 'Ledok', 'Kelurahan di Argomulyo'),
+(1, 'Noborejo', 'Kelurahan di Argomulyo'),
 
-INSERT INTO barang_pasar_grid (id_pasar, id_barang) VALUES
-(1, 1), -- Beras Premium di Pasar Pagi
-(2, 2); -- Kertas HVS di Pasar Malam
+-- Sidomukti (id_kecamatan = 2)
+(2, 'Mangunsari', 'Kelurahan di Sidomukti'),
+(2, 'Kalibening', 'Kelurahan di Sidomukti'),
+(2, 'Dukuh', 'Kelurahan di Sidomukti'),
 
+-- Sidorejo (id_kecamatan = 3)
+(3, 'Bugel', 'Kelurahan di Sidorejo'),
+(3, 'Pulutan', 'Kelurahan di Sidorejo'),
+(3, 'Kumpulrejo', 'Kelurahan di Sidorejo'),
 
-INSERT INTO harga_barang_pasar (id_barang_pasar, harga, time_stamp) VALUES
-(1, 12000.00, NOW()), -- Harga beras premium di Pasar Pagi
-(2, 45000.00, NOW()); -- Harga kertas HVS di Pasar Malam
+-- Tingkir (id_kecamatan = 4)
+(4, 'Gendongan', 'Kelurahan di Tingkir'),
+(4, 'Sidorejo Lor', 'Kelurahan di Tingkir'),
+(4, 'Kalibening', 'Kelurahan di Tingkir');

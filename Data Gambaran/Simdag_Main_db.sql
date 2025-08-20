@@ -91,3 +91,55 @@ JOIN harga_barang_pasar h2
 JOIN barang_pasar_grid bpg ON h1.id_barang_pasar = bpg.id_barang_pasar
 JOIN nama_pasar np ON bpg.id_pasar = np.id_pasar
 JOIN nama_barang nb ON bpg.id_barang = nb.id_barang;
+
+
+
+-- ======================== SPBU LPG================================================
+
+-- Table kecamatan
+CREATE TABLE kecamatan (
+    id_kecamatan INT AUTO_INCREMENT PRIMARY KEY,
+    nama_kecamatan VARCHAR(100) NOT NULL,
+    keterangan TEXT
+);
+
+-- Tabel Kelurahan 
+CREATE TABLE kelurahan (
+    id_kelurahan INT AUTO_INCREMENT PRIMARY KEY,
+    id_kecamatan INT NOT NULL,
+    nama_kelurahan VARCHAR(100) NOT NULL,
+    keterangan TEXT,
+    FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan) ON DELETE CASCADE
+);
+
+-- table spbu
+CREATE TABLE spbu (
+    id_spbu INT AUTO_INCREMENT PRIMARY KEY,
+    no_spbu VARCHAR(50) NOT NULL,
+    id_kecamatan INT NOT NULL,
+    id_kelurahan INT NOT NULL,
+    alamat TEXT NOT NULL,
+    latitude DECIMAL(10,7),
+    longitude DECIMAL(10,7),
+    telepon VARCHAR(50),
+    penanggung_jawab VARCHAR(100),
+    FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan),
+    FOREIGN KEY (id_kelurahan) REFERENCES kelurahan(id_kelurahan)
+);
+
+-- table refrensi jenis dokumen spbu
+CREATE TABLE ref_doku_spbu (
+    id_ref_dSPBU INT AUTO_INCREMENT PRIMARY KEY,
+    nama_jenis_dok VARCHAR(255) NOT NULL
+);
+
+-- tabel dokumen spbu
+CREATE TABLE dokumen_spbu (
+    id_dokumenSPBU INT AUTO_INCREMENT PRIMARY KEY,
+    id_spbu INT NOT NULL,
+    id_ref_dSPBU INT NOT NULL,
+    file_path VARCHAR(255),
+    keterangan TEXT,
+    FOREIGN KEY (id_spbu) REFERENCES spbu(id_spbu) ON DELETE CASCADE,
+    FOREIGN KEY (id_ref_dSPBU) REFERENCES ref_doku_spbu(id_ref_dSPBU) ON DELETE CASCADE
+);
