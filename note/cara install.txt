@@ -14,7 +14,6 @@ untuk backend
     9. npm install @nestjs/mapped-types
     10. npm install class-validator class-transformer
     11. npm install exceljs
-    ------
     12. npm install @nestjs/serve-static
     13. npm install --save-dev @types/express @types/multer
 
@@ -22,6 +21,18 @@ untuk migrating
     1. npx ts-node src/seeds/create-admin.seed.ts
         note: ganti create-admin.seed.ts dengan file yang ingin di migrate
 
+generate sandi
+    1. buka cmd
+    2. pastikan nodejs ada
+    3. jalankan
+        JWT pakai
+        node -e "console.log(require('crypto').randomBytes(20).toString('base64'))"
+
+        AES pakai ini
+            node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+        randomBytes(32)
+            -> 32 jadi 64 karakter
 
 untuk forntend
     1.  npm create vite@latest . -- --template react-ts

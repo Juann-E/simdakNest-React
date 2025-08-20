@@ -20,6 +20,12 @@ export class DokumenSpbu {
   @Column({ type: 'text', nullable: true })
   keterangan: string;
 
+  @Column({ nullable: true })
+  file_ext: string;
+
+  @Column({ nullable: true })
+  file_name?: string;
+
   @ManyToOne(() => Spbu, spbu => spbu.dokumen, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_spbu' })
   spbu: Spbu;

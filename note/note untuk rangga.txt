@@ -88,4 +88,9 @@
     | 3               | 1        | 3              | uploads/peta\_lokasi.jpg    | Skala 1:50           |
     | 4               | 1        | 4              | uploads/imb.pdf             | IMB disahkan 2023    |
 
-3.  ada informasi tambahan di Data Gambaran\cara pakai git.txt
+
+    ------------------- ini baru ---------------
+3.  ada informasi tambahan di Data Gambaran\cara pakai git.txt (note)
+4.  ada infromasi tambahan di note\cara install.txt (generate sandi)
+5.  nanti untuk yang dokumen_spbu di tabelnya kalau dijalakan programnya 
+    otomatis nambal kolom baru jadi tidak usah bingung alter table

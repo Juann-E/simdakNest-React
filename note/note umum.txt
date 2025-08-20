@@ -1,0 +1,1 @@
+file .env masih di upload, jika sudah mau di deploy .env di git ignore diperbaiki
