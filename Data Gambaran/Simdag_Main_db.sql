@@ -109,8 +109,11 @@ CREATE TABLE kelurahan (
     id_kecamatan INT NOT NULL,
     nama_kelurahan VARCHAR(100) NOT NULL,
     keterangan TEXT,
-    FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan) ON DELETE CASCADE
+    CONSTRAINT fk_kelurahan_kecamatan
+      FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan)
+      ON DELETE CASCADE
 );
+
 
 -- table spbu
 CREATE TABLE spbu (

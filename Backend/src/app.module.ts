@@ -21,6 +21,10 @@ import { BarangPasarGridModule } from './modules/Kepokmas/barang-pasar-grid/bara
 import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/harga-barang-pasar.module';
 import { ReportModule } from './modules/Kepokmas/report/report.module';
 
+// Alamat Modules
+import { KecamatanModule } from './modules/Alamat/Kecamatan/kecamatan.module';
+import { KelurahanModule } from './modules/Alamat/Kelurahan/kelurahan.module';
+
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
 
@@ -65,8 +69,11 @@ import { PublicModule } from './common/public/public.module';
     HargaBarangPasarModule,
     ReportModule,
 
+    // Alamat Modules
+    KecamatanModule,
+    KelurahanModule,
     // Public access module
     PublicModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
