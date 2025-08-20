@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete, Param, Body, Query,
-  UseGuards, ParseIntPipe
+  UseGuards, ParseIntPipe, BadRequestException
 } from '@nestjs/common';
 import { KelurahanService } from './kelurahan.service';
 import { CreateKelurahanDto } from './dto/create-kelurahan.dto';
@@ -13,14 +13,16 @@ import { UserRole } from '../../../common/enums/user-role.enum';
 @Controller('kelurahan')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class KelurahanController {
-  constructor(private readonly kelurahanService: KelurahanService) { }
+  constructor(private readonly kelurahanService: KelurahanService) {}
 
+  // CREATE
   @Post()
   @Roles(UserRole.ADMIN)
   create(@Body() dto: CreateKelurahanDto) {
     return this.kelurahanService.create(dto);
   }
-  
+
+  // READ: all, by id_kelurahan, or by id_kecamatan
   @Get()
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async findAllOrFiltered(
@@ -43,31 +45,37 @@ export class KelurahanController {
     return this.kelurahanService.findAll();
   }
 
-
-  // PATCH pakai dua versi route
+  // UPDATE via URL
   @Patch(':id')
   @Roles(UserRole.ADMIN)
-  updateByUrl(@Param('id') id: number, @Body() dto: UpdateKelurahanDto) {
-    return this.kelurahanService.update(+id, dto);
+  updateByUrl(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateKelurahanDto) {
+    return this.kelurahanService.update(id, dto);
   }
 
+  // UPDATE via Body
   @Patch()
   @Roles(UserRole.ADMIN)
-  updateByBody(@Body() dto: UpdateKelurahanDto & { id: number }) {
-    return this.kelurahanService.update(+dto.id, dto);
+  updateByBody(@Body() dto: UpdateKelurahanDto & { id_kelurahan: number }) {
+    if (!dto.id_kelurahan) {
+      throw new BadRequestException('id_kelurahan harus disertakan dalam body');
+    }
+    return this.kelurahanService.update(dto.id_kelurahan, dto);
   }
 
-  // DELETE pakai dua versi route
+  // DELETE via URL
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  removeByUrl(@Param('id') id: number) {
-    return this.kelurahanService.remove(+id);
+  removeByUrl(@Param('id', ParseIntPipe) id: number) {
+    return this.kelurahanService.remove(id);
   }
 
+  // DELETE via Body
   @Delete()
   @Roles(UserRole.ADMIN)
-  removeByBody(@Body('id') id: number) {
-    return this.kelurahanService.remove(+id);
+  removeByBody(@Body('id_kelurahan', ParseIntPipe) id: number) {
+    if (!id) {
+      throw new BadRequestException('id_kelurahan harus disertakan dalam body');
+    }
+    return this.kelurahanService.remove(id);
   }
-
 }
