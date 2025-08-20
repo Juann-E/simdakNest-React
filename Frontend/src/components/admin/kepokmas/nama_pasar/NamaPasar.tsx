@@ -284,9 +284,9 @@ export default function NamaPasar() {
                     value={formData.koordinat}
                     onChange={(e) => setFormData({ ...formData, koordinat: e.target.value })}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                    placeholder='Contoh: 7°19&#39;31.1"S 110°30&#39;14.0"E'
+                    placeholder='Contoh: -7.330054997778679, 110.50510243753217'
                 />
-                <p className="mt-1 text-xs text-gray-500">Salin & tempel koordinat langsung dari Google Maps.</p>
+                <p className="mt-1 text-xs text-gray-500">Klik kanan lalu Salin & tempel koordinat langsung dari Google Maps.</p>
              </div>
              <div>
                  <label htmlFor="market-image" className="block text-sm font-medium text-gray-700">Gambar Pasar</label>
