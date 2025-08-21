@@ -45,6 +45,13 @@ export class KelurahanController {
     return this.kelurahanService.findAll();
   }
 
+  // GET kelurahan by kecamatan ID via URL parameter
+  @Get('kecamatan/:id')
+  @Roles(UserRole.ADMIN, UserRole.OPERATOR)
+  findByKecamatanParam(@Param('id', ParseIntPipe) id: number) {
+    return this.kelurahanService.findByKecamatan(id);
+  }
+
   // UPDATE via URL
   @Patch(':id')
   @Roles(UserRole.ADMIN)

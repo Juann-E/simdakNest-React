@@ -9,6 +9,8 @@ import Sidebar from './components/admin/Sidebar';
 import DashboardPage from './pages/admin/DashboardPage';
 import Header from './components/Header';
 import KepokmasPage from './pages/admin/KepokmasPage';
+import SpbuLpgPage from './pages/admin/SpbuLpgPage';
+import SettingsPage from './pages/admin/SettingsPage';
 import GridDetailPage from './components/admin/kepokmas/GridDetailPage';
 import HargaGridDetailPage from './components/admin/kepokmas/harga_barang_grid/HargaGridDetailPage';
 
@@ -68,6 +70,12 @@ function App() {
         {/* Rute baru yang lebih fleksibel untuk Kepokmas */}
         <Route path="kepokmas/:tab" element={<KepokmasPage />} />
 
+        {/* Rute untuk SPBU LPG */}
+        <Route path="spbu-lpg/:tab" element={<SpbuLpgPage />} />
+
+        {/* Rute untuk Settings */}
+        <Route path="settings/:tab" element={<SettingsPage />} />
+
         {/* Rute untuk halaman detail dan input */}
         <Route path="kepokmas/barang-pasar-grid/:marketId" element={<GridDetailPage />} />
         <Route path="kepokmas/harga-barang-grid/:marketId" element={<HargaGridDetailPage />} />
@@ -79,6 +87,18 @@ function App() {
         <Route
           path="kepokmas"
           element={<Navigate to="/admin/kepokmas/nama-pasar" replace />}
+        />
+        
+        {/* Tambahkan redirect agar /admin/spbu-lpg otomatis ke tab pertama */}
+        <Route
+          path="spbu-lpg"
+          element={<Navigate to="/admin/spbu-lpg/spbu" replace />}
+        />
+        
+        {/* Tambahkan redirect agar /admin/settings otomatis ke tab pertama */}
+        <Route
+          path="settings"
+          element={<Navigate to="/admin/settings/kecamatan" replace />}
         />
       </Route>
     </Routes>

@@ -31,4 +31,10 @@ export class PublicController {
   getChartData() {
     return this.publicService.getChartData();
   }
+
+  @Public()
+  @Get('locations')
+  getAllLocations() {
+    return this.publicService.getAllLocations();
+  }
 }

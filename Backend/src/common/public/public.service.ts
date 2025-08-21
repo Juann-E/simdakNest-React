@@ -5,6 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NamaPasar } from '../../modules/Kepokmas/nama-pasar/nama-pasar.entity';
 import { HargaBarangPasar } from '../../modules/Kepokmas/harga-barang-grid/harga-barang-pasar.entity';
+import { Spbu } from '../../modules/SPBU_LPG/SPBU/main/spbu.entity';
+import { Agen } from '../../modules/SPBU_LPG/Agen/agen.entity';
+import { PangkalanLpg } from '../../modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.entity';
+import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
 
 @Injectable()
 export class PublicService {
@@ -13,6 +17,14 @@ export class PublicService {
     private readonly pasarRepo: Repository<NamaPasar>,
     @InjectRepository(HargaBarangPasar)
     private readonly hargaRepo: Repository<HargaBarangPasar>,
+    @InjectRepository(Spbu)
+    private readonly spbuRepo: Repository<Spbu>,
+    @InjectRepository(Agen)
+    private readonly agenRepo: Repository<Agen>,
+    @InjectRepository(PangkalanLpg)
+    private readonly pangkalanLpgRepo: Repository<PangkalanLpg>,
+    @InjectRepository(Spbe)
+    private readonly spbeRepo: Repository<Spbe>,
   ) {}
 
   /**
@@ -119,5 +131,80 @@ export class PublicService {
     const chartLines = topItems.map((key, index) => ({ key, color: colors[index % colors.length] }));
 
     return { chartData: formattedChartData, chartLines };
+  }
+
+  /**
+   * Mengambil semua data lokasi untuk peta dengan koordinat
+   */
+  async getAllLocations() {
+     const [markets, spbu, agen, pangkalanLpg, spbe] = await Promise.all([
+       this.pasarRepo.createQueryBuilder('pasar')
+         .where('pasar.latitude IS NOT NULL')
+         .andWhere('pasar.longitude IS NOT NULL')
+         .getMany(),
+       this.spbuRepo.createQueryBuilder('spbu')
+         .where('spbu.latitude IS NOT NULL')
+         .andWhere('spbu.longitude IS NOT NULL')
+         .andWhere('spbu.status = :status', { status: 'Aktif' })
+         .getMany(),
+       this.agenRepo.createQueryBuilder('agen')
+         .where('agen.latitude IS NOT NULL')
+         .andWhere('agen.longitude IS NOT NULL')
+         .andWhere('agen.status = :status', { status: 'Aktif' })
+         .getMany(),
+       this.pangkalanLpgRepo.createQueryBuilder('pangkalan')
+         .where('pangkalan.latitude IS NOT NULL')
+         .andWhere('pangkalan.longitude IS NOT NULL')
+         .andWhere('pangkalan.status = :status', { status: 'Aktif' })
+         .getMany(),
+       this.spbeRepo.createQueryBuilder('spbe')
+         .where('spbe.latitude IS NOT NULL')
+         .andWhere('spbe.longitude IS NOT NULL')
+         .andWhere('spbe.status = :status', { status: 'Aktif' })
+         .getMany()
+     ]);
+
+    return {
+      markets: markets.map(item => ({
+        id: item.id,
+        name: item.nama_pasar,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'market'
+      })),
+      spbu: spbu.map(item => ({
+        id: item.id_spbu,
+        name: item.nama_usaha,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'spbu'
+      })),
+      agen: agen.map(item => ({
+        id: item.id_agen,
+        name: item.nama_usaha,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'agen'
+      })),
+      pangkalanLpg: pangkalanLpg.map(item => ({
+        id: item.id_pangkalan_lpg,
+        name: item.nama_usaha,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'pangkalan_lpg'
+      })),
+      spbe: spbe.map(item => ({
+        id: item.id_spbe,
+        name: item.nama_usaha,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'spbe'
+      }))
+    };
   }
 }

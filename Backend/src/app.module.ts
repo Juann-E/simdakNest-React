@@ -29,6 +29,9 @@ import { KelurahanModule } from './modules/Alamat/Kelurahan/kelurahan.module';
 import { SpbuModule } from './modules/SPBU_LPG/SPBU/main/spbu.module';
 import { RefDokuSpbuModule } from './modules/SPBU_LPG/SPBU/refrensi_doku_spbu/ref-doku-spbu.module';
 import { DokumenSpbuModule } from './modules/SPBU_LPG/SPBU/dokumen_spbu/dokumen-spbu.module';
+import { AgenModule } from './modules/SPBU_LPG/Agen/agen.module';
+import { PangkalanLpgModule } from './modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.module';
+import { SpbeModule } from './modules/SPBU_LPG/Spbe/spbe.module';
 
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
@@ -82,6 +85,9 @@ import { PublicModule } from './common/public/public.module';
     SpbuModule,
     RefDokuSpbuModule,
     DokumenSpbuModule,
+    AgenModule,
+    PangkalanLpgModule,
+    SpbeModule,
     
     // Public access module
     PublicModule,

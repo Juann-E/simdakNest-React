@@ -1,51 +1,47 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum } from 'class-validator';
 
-export class CreateSpbuDto {
-  @IsNotEmpty()
+export class CreateSpbeDto {
   @IsString()
+  @IsNotEmpty()
   nama_usaha: string;
 
-  @IsNotEmpty()
-  @IsString()
-  no_spbu: string;
-
-  @IsNotEmpty()
   @IsNumber()
+  @IsNotEmpty()
   id_kecamatan: number;
 
-  @IsNotEmpty()
   @IsNumber()
+  @IsNotEmpty()
   id_kelurahan: number;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   alamat: string;
 
-  @IsOptional()
   @IsString()
-  koordinat?: string;   
-  
   @IsOptional()
+  koordinat?: string;
+
   @IsNumber()
+  @IsOptional()
   latitude?: number;
 
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   longitude?: number;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   telepon?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   penanggung_jawab?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   nomor_hp_penanggung_jawab?: string;
 
+  @IsEnum(['Aktif', 'Tidak Aktif'])
   @IsOptional()
-  @IsString()
   status?: string;
 }

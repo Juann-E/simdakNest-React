@@ -9,6 +9,10 @@ import { PublicService } from './public.service';
 import { NamaPasar } from '../../modules/Kepokmas/nama-pasar/nama-pasar.entity';
 import { HargaBarangPasar } from '../../modules/Kepokmas/harga-barang-grid/harga-barang-pasar.entity';
 import { BarangPasarGrid } from '../../modules/Kepokmas/barang-pasar-grid/barang-pasar-grid.entity';
+import { Spbu } from '../../modules/SPBU_LPG/SPBU/main/spbu.entity';
+import { Agen } from '../../modules/SPBU_LPG/Agen/agen.entity';
+import { PangkalanLpg } from '../../modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.entity';
+import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
 
 @Module({
   imports: [
@@ -18,7 +22,7 @@ import { BarangPasarGrid } from '../../modules/Kepokmas/barang-pasar-grid/barang
       rootPath: join(process.cwd(), 'uploads'),
       // serveRoot secara default adalah '/', ini berarti URL akan mengikuti struktur folder
     }),
-    TypeOrmModule.forFeature([NamaPasar, HargaBarangPasar, BarangPasarGrid]),
+    TypeOrmModule.forFeature([NamaPasar, HargaBarangPasar, BarangPasarGrid, Spbu, Agen, PangkalanLpg, Spbe]),
   ],
   controllers: [PublicController],
   providers: [PublicService],

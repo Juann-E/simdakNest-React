@@ -1,25 +1,59 @@
 // src/components/admin/Sidebar.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Boxes, LogOut, ChevronDown, CircleDot } from 'lucide-react';
+import { LayoutDashboard, Boxes, LogOut, ChevronDown, Fuel, Settings } from 'lucide-react';
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State untuk mengontrol menu Kepokmas
-  const [isKepokmasOpen, setIsKepokmasOpen] = useState(true);
-
   // Cek apakah rute saat ini ada di dalam section Kepokmas
   const isKepokmasActive = location.pathname.startsWith('/admin/kepokmas');
+  
+  // Cek apakah rute saat ini ada di dalam section SPBU LPG
+  const isSpbuLpgActive = location.pathname.startsWith('/admin/spbu-lpg');
+  
+  // Cek apakah rute saat ini ada di dalam section Settings
+  const isSettingsActive = location.pathname.startsWith('/admin/settings');
+
+  // 1. Ubah state awal 'isKepokmasOpen' berdasarkan rute aktif
+  const [isKepokmasOpen, setIsKepokmasOpen] = useState(isKepokmasActive);
+  
+  // State untuk menu SPBU LPG
+  const [isSpbuLpgOpen, setIsSpbuLpgOpen] = useState(isSpbuLpgActive);
+  
+  // State untuk menu Settings
+  const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsActive);
+  
+  // 2. Tambahkan state baru untuk menu akun
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+
+  // Efek untuk membuka menu Kepokmas secara otomatis jika pengguna menavigasi ke halamannya
+  useEffect(() => {
+    if (isKepokmasActive) {
+      setIsKepokmasOpen(true);
+    }
+  }, [isKepokmasActive]);
+  
+  // Efek untuk membuka menu SPBU LPG secara otomatis jika pengguna menavigasi ke halamannya
+  useEffect(() => {
+    if (isSpbuLpgActive) {
+      setIsSpbuLpgOpen(true);
+    }
+  }, [isSpbuLpgActive]);
+  
+  // Efek untuk membuka menu Settings secara otomatis jika pengguna menavigasi ke halamannya
+  useEffect(() => {
+    if (isSettingsActive) {
+      setIsSettingsOpen(true);
+    }
+  }, [isSettingsActive]);
 
   const handleLogout = () => {
     // Hapus token otentikasi
     localStorage.removeItem('accessToken');
     
     // Hapus semua data input harga yang tersimpan sementara di browser
-    // Logika ini akan mencari semua key di localStorage yang diawali dengan 'priceInput_market_'
-    // dan menghapusnya satu per satu.
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('priceInput_market_')) {
         localStorage.removeItem(key);
@@ -49,7 +83,6 @@ export default function Sidebar() {
           <span className="ml-3">Dashboard</span>
         </NavLink>
 
-        {/* Tombol Kepokmas yang bisa dilipat */}
         <button 
           onClick={() => setIsKepokmasOpen(!isKepokmasOpen)} 
           className={`w-full flex items-center justify-between p-2 text-gray-700 rounded-lg hover:bg-gray-200 ${isKepokmasActive ? 'bg-gray-100' : ''}`}
@@ -61,7 +94,6 @@ export default function Sidebar() {
           <ChevronDown className={`w-5 h-5 transition-transform ${isKepokmasOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Sub-menu Kepokmas */}
         {isKepokmasOpen && (
           <div className="space-y-1 mt-1">
             <NavLink to="/admin/kepokmas/nama-pasar" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
@@ -85,15 +117,79 @@ export default function Sidebar() {
           </div>
         )}
 
+        <button 
+          onClick={() => setIsSpbuLpgOpen(!isSpbuLpgOpen)} 
+          className={`w-full flex items-center justify-between p-2 text-gray-700 rounded-lg hover:bg-gray-200 ${isSpbuLpgActive ? 'bg-gray-100' : ''}`}
+        >
+          <div className="flex items-center">
+            <Fuel className="w-5 h-5" />
+            <span className="ml-3">SPBU LPG</span>
+          </div>
+          <ChevronDown className={`w-5 h-5 transition-transform ${isSpbuLpgOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isSpbuLpgOpen && (
+          <div className="space-y-1 mt-1">
+            <NavLink to="/admin/spbu-lpg/spbu" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              SPBU
+            </NavLink>
+            <NavLink to="/admin/spbu-lpg/agen" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Agen
+            </NavLink>
+            <NavLink to="/admin/spbu-lpg/pangkalan-lpg" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Pangkalan LPG
+            </NavLink>
+            <NavLink to="/admin/spbu-lpg/spbe" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              SPBE
+            </NavLink>
+          </div>
+        )}
+
+        <button 
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)} 
+          className={`w-full flex items-center justify-between p-2 text-gray-700 rounded-lg hover:bg-gray-200 ${isSettingsActive ? 'bg-gray-100' : ''}`}
+        >
+          <div className="flex items-center">
+            <Settings className="w-5 h-5" />
+            <span className="ml-3">Settings</span>
+          </div>
+          <ChevronDown className={`w-5 h-5 transition-transform ${isSettingsOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isSettingsOpen && (
+          <div className="space-y-1 mt-1">
+            <NavLink to="/admin/settings/kecamatan" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Kecamatan
+            </NavLink>
+            <NavLink to="/admin/settings/kelurahan" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Kelurahan
+            </NavLink>
+          </div>
+        )}
       </nav>
-      <div className="p-4 border-t mt-auto">
-        <div className="flex items-center">
+      
+      {/* --- 3. Bagian Akun & Logout yang Diperbarui --- */}
+      <div className="p-4 border-t mt-auto relative">
+        {/* Menu pop-up untuk logout */}
+        {isAccountMenuOpen && (
+          <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border rounded-lg shadow-lg p-1 transition-all">
+            <button onClick={handleLogout} className="w-full flex items-center p-2 text-sm text-red-600 rounded-md hover:bg-red-50">
+              <LogOut className="w-4 h-4 mr-2" />
+              Keluar
+            </button>
+          </div>
+        )}
+
+        {/* Tombol Profil Admin */}
+        <button 
+          onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+          className="w-full flex items-center p-2 rounded-lg transition-colors hover:bg-gray-100"
+        >
           <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-yellow-900">A</div>
-          <div className="ml-3"><p className="font-semibold text-gray-800">Administrator</p><p className="text-xs text-gray-500">admin@salatiga.go.id</p></div>
-        </div>
-        <button onClick={handleLogout} className="w-full mt-4 flex items-center justify-center p-2 text-sm text-red-600 rounded-lg hover:bg-red-50">
-          <LogOut className="w-4 h-4 mr-2" />
-          Keluar
+          <div className="ml-3 text-left">
+            <p className="font-semibold text-gray-800">Administrator</p>
+            <p className="text-xs text-gray-500">admin@salatiga.go.id</p>
+          </div>
         </button>
       </div>
     </aside>

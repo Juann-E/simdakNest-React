@@ -1,13 +1,9 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
 
-export class CreateSpbuDto {
+export class CreatePangkalanLpgDto {
   @IsNotEmpty()
   @IsString()
   nama_usaha: string;
-
-  @IsNotEmpty()
-  @IsString()
-  no_spbu: string;
 
   @IsNotEmpty()
   @IsNumber()
@@ -23,7 +19,7 @@ export class CreateSpbuDto {
 
   @IsOptional()
   @IsString()
-  koordinat?: string;   
+  koordinat?: string;
   
   @IsOptional()
   @IsNumber()
@@ -46,6 +42,6 @@ export class CreateSpbuDto {
   nomor_hp_penanggung_jawab?: string;
 
   @IsOptional()
-  @IsString()
+  @IsEnum(['Aktif', 'Tidak Aktif'])
   status?: string;
 }
