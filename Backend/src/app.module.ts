@@ -22,16 +22,20 @@ import { HargaBarangPasarModule } from './modules/Kepokmas/harga-barang-grid/har
 import { ReportModule } from './modules/Kepokmas/report/report.module';
 
 // Alamat Modules
-import { KecamatanModule } from './modules/Alamat/Kecamatan/kecamatan.module';
-import { KelurahanModule } from './modules/Alamat/Kelurahan/kelurahan.module';
+import { KecamatanModule } from './modules/Setting/Kecamatan/kecamatan.module';
+import { KelurahanModule } from './modules/Setting/Kelurahan/kelurahan.module';
 
 // SPBU_LPG Modules
+<<<<<<< HEAD
 import { SpbuModule } from './modules/SPBU_LPG/SPBU/main/spbu.module';
 import { RefDokuSpbuModule } from './modules/SPBU_LPG/SPBU/refrensi_doku_spbu/ref-doku-spbu.module';
 import { DokumenSpbuModule } from './modules/SPBU_LPG/SPBU/dokumen_spbu/dokumen-spbu.module';
 import { AgenModule } from './modules/SPBU_LPG/Agen/agen.module';
 import { PangkalanLpgModule } from './modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.module';
 import { SpbeModule } from './modules/SPBU_LPG/Spbe/spbe.module';
+=======
+import { SpbuModule } from './modules/SPBU_LPG/SPBU/spbu.module';
+>>>>>>> 17ac419b52c9b842fb9c18161347fe3832cdc14e
 
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
@@ -83,11 +87,15 @@ import { PublicModule } from './common/public/public.module';
 
     // SPBU_LPG Module
     SpbuModule,
+<<<<<<< HEAD
     RefDokuSpbuModule,
     DokumenSpbuModule,
     AgenModule,
     PangkalanLpgModule,
     SpbeModule,
+=======
+
+>>>>>>> 17ac419b52c9b842fb9c18161347fe3832cdc14e
     
     // Public access module
     PublicModule,

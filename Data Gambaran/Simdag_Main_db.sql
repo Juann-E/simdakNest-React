@@ -128,22 +128,3 @@ CREATE TABLE spbu (
     FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan),
     FOREIGN KEY (id_kelurahan) REFERENCES kelurahan(id_kelurahan)
 );
-
--- table refrensi jenis dokumen spbu
-CREATE TABLE ref_doku_spbu (
-    id_ref_dSPBU INT AUTO_INCREMENT PRIMARY KEY,
-    nama_jenis_dok VARCHAR(255) NOT NULL
-);
-
--- tabel dokumen spbu
-CREATE TABLE dokumen_spbu (
-    id_dokumenSPBU INT AUTO_INCREMENT PRIMARY KEY,
-    id_spbu INT NOT NULL,
-    id_ref_dSPBU INT NOT NULL,
-    file_path VARCHAR(255),
-    file_name VARCHAR(255),       -- nama asli file
-    file_ext VARCHAR(10),         -- ekstensi file, misal .PDF
-    keterangan TEXT,
-    FOREIGN KEY (id_spbu) REFERENCES spbu(id_spbu) ON DELETE CASCADE,
-    FOREIGN KEY (id_ref_dSPBU) REFERENCES ref_doku_spbu(id_ref_dSPBU) ON DELETE CASCADE
-);

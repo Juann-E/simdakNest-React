@@ -2,10 +2,10 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Pa
 import { SpbuService } from './spbu.service';
 import { CreateSpbuDto } from './dto/create-spbu.dto';
 import { UpdateSpbuDto } from './dto/update-spbu.dto';
-import { JwtAuthGuard } from '../../../../auth/jwt-auth.guard';
-import { RolesGuard } from '../../../../auth/roles.guard';
-import { Roles } from '../../../../common/decorators/roles.decorator';
-import { UserRole } from '../../../../common/enums/user-role.enum';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRole } from '../../../common/enums/user-role.enum';
 
 @Controller('spbu')
 @UseGuards(JwtAuthGuard, RolesGuard)
