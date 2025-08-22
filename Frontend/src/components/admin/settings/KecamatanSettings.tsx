@@ -1,6 +1,6 @@
 // src/components/admin/settings/KecamatanSettings.tsx
 import { useState, useEffect } from 'react';
-import { Building, Plus, Edit, Trash2, Search, Download, Upload } from 'lucide-react';
+import { Building, Plus, Edit, Trash2, Search } from 'lucide-react';
 
 interface Kecamatan {
   id_kecamatan: number;
@@ -160,14 +160,6 @@ export default function KecamatanSettings() {
           <h2 className="text-xl font-semibold text-gray-800">Data Kecamatan</h2>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Export
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            Import
-          </button>
           <button 
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"

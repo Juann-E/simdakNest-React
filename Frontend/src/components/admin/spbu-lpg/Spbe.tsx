@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Building, Search, Plus, Upload, Download, Edit, Trash2, MapPin } from 'lucide-react';
+import { Building, Search, Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import Modal from '../../ui/Modal';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 
@@ -168,7 +168,7 @@ export default function Spbe() {
       telepon: spbe.telepon,
       nomor_hp_penanggung_jawab: spbe.nomor_hp_penanggung_jawab || '',
       status: spbe.status,
-      koordinat: spbe.koordinat,
+      koordinat: spbe.koordinat || '',
       id_kecamatan: spbe.id_kecamatan?.toString() || '',
       id_kelurahan: spbe.id_kelurahan?.toString() || ''
     });
@@ -251,8 +251,6 @@ export default function Spbe() {
             <p className="text-sm text-gray-500">Kelola data Stasiun Pengisian Bahan Bakar Elektrik</p>
           </div>
           <div className="flex space-x-2">
-            <button className="btn-secondary"><Download size={16} className="mr-2"/>Export</button>
-            <button className="btn-secondary"><Upload size={16} className="mr-2"/>Import</button>
             <button onClick={handleOpenCreateModal} className="btn-primary"><Plus size={16} className="mr-2"/>Tambah SPBE</button>
           </div>
         </div>

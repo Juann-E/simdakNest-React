@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Building, Search, Plus, Upload, Download, Edit, Trash2, Image as ImageIcon, MapPin } from 'lucide-react';
+import { Building, Search, Plus, Edit, Trash2, Image as ImageIcon, MapPin } from 'lucide-react';
 import Modal from '../../../ui/Modal';
 import ConfirmationModal from '../../../ui/ConfirmationModal';
 
@@ -177,8 +177,6 @@ export default function NamaPasar() {
             <p className="text-sm text-gray-500">Kelola data pasar tradisional untuk survey komoditas</p>
           </div>
           <div className="flex space-x-2">
-            <button className="btn-secondary"><Download size={16} className="mr-2"/>Export</button>
-            <button className="btn-secondary"><Upload size={16} className="mr-2"/>Import</button>
             <button onClick={handleOpenCreateModal} className="btn-primary"><Plus size={16} className="mr-2"/>Tambah Pasar</button>
           </div>
         </div>
