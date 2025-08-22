@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Kecamatan } from '../../Alamat/Kecamatan/kecamatan.entity';
-import { Kelurahan } from '../../Alamat/Kelurahan/kelurahan.entity';
+import { Kecamatan } from '../../Setting/Kecamatan/kecamatan.entity';
+import { Kelurahan } from '../../Setting/Kelurahan/kelurahan.entity';
 
 @Entity('pangkalan_lpg')
 export class PangkalanLpg {
