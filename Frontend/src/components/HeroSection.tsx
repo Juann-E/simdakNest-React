@@ -4,11 +4,11 @@ export default function HeroSection() {
   return (
     <section className="py-6 sm:py-8 lg:py-12">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-gray-600 to-yellow-500 bg-clip-text text-transparent">
+        <div className="text-center space-y-6 sm:space-y-8 mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-gray-600 to-yellow-500 bg-clip-text text-transparent pb-4 mb-4">
             SIMDAG Salatiga
           </h1>
-          <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-gray-800">
+          <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-gray-800 mt-6">
             Sistem Monitoring Kepokmas Pasar
           </h2>
           <p className="text-sm sm:text-base lg:text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed">
