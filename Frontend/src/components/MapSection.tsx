@@ -92,7 +92,7 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: false,
     agen: false,
     pangkalan_lpg: false,
-    spbe: true
+    spbe: false
   });
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const mapRef = useRef<any>(null);
