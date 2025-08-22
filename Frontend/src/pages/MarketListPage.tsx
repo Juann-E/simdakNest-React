@@ -58,12 +58,12 @@ export default function MarketListPage() {
         <HeroSection />
         <FeatureCarousel />
         
-        {/* === BAGIAN PETA LOKASI PASAR === */}
+        {/* === BAGIAN PETA LOKASI === */}
         <section className="container mx-auto px-4 sm:px-6">
           <div className="text-center space-y-4 mb-12">
-            <h3 className="text-4xl font-bold text-gray-800">Peta Lokasi Pasar</h3>
+            <h3 className="text-4xl font-bold text-gray-800">Peta Lokasi</h3>
             <p className="text-xl text-gray-500 max-w-3xl mx-auto">
-              Lihat persebaran lokasi pasar yang telah terintegrasi dengan sistem kami.
+              Lihat persebaran lokasi yang telah terintegrasi dengan sistem kami.
             </p>
           </div>
           
