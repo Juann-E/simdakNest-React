@@ -27,6 +27,9 @@ import { KelurahanModule } from './modules/Setting/Kelurahan/kelurahan.module';
 
 // SPBU_LPG Modules
 import { SpbuModule } from './modules/SPBU_LPG/SPBU/spbu.module';
+import { AgenModule } from './modules/SPBU_LPG/Agen/agen.module';
+import { PangkalanLpgModule } from './modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.module';
+import { SpbeModule } from './modules/SPBU_LPG/Spbe/spbe.module';
 
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
@@ -76,8 +79,11 @@ import { PublicModule } from './common/public/public.module';
     KecamatanModule,
     KelurahanModule,
 
-    // SPBU_LPG Module
+    // SPBU_LPG Modules
     SpbuModule,
+    AgenModule,
+    PangkalanLpgModule,
+    SpbeModule,
     
     // Public access module
     PublicModule,
