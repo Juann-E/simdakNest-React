@@ -2,7 +2,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { type LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 // Perbaikan untuk ikon default Leaflet yang terkadang tidak muncul
@@ -92,8 +92,10 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: false,
     agen: false,
     pangkalan_lpg: false,
-    spbe: false
+    spbe: true
   });
+  const [isFilterVisible, setIsFilterVisible] = useState(true);
+  const mapRef = useRef<any>(null);
 
   // Fetch data lokasi dari API
   useEffect(() => {
@@ -152,6 +154,16 @@ export default function MapSection({ selectedLocation }: MapProps) {
     setSelectedMarker(location);
   };
 
+  const toggleFilter = () => {
+    setIsFilterVisible(!isFilterVisible);
+    // Delay untuk memastikan transisi selesai sebelum resize peta
+    setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    }, 350); // Sedikit lebih lama dari durasi transisi (300ms)
+  };
+
   if (loading) {
     return (
       <div className="h-[600px] w-full rounded-lg overflow-hidden shadow-lg flex items-center justify-center bg-gray-100">
@@ -164,42 +176,59 @@ export default function MapSection({ selectedLocation }: MapProps) {
   }
 
   return (
-    <div className="flex w-full h-[600px] bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200">
-      {/* Sidebar Kiri */}
-      <div className="w-2/5 lg:w-1/3 xl:w-2/5 bg-white border-r border-gray-300 overflow-y-auto">
-        <div className="p-4 sm:p-6">
-           {/* Filter Toggle */}
-           <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-xl">
-             <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Filter Kategori</h4>
-             <div className="space-y-2 sm:space-y-3">
-               {Object.entries(categoryLabels).map(([key, label]) => {
-                 const categoryKey = key as keyof typeof visibleCategories;
-                 const iconColor = {
-                   market: '#10B981',
-                   spbu: '#3B82F6',
-                   agen: '#F59E0B',
-                   pangkalan_lpg: '#EF4444',
-                   spbe: '#8B5CF6'
-                 }[categoryKey];
-                 
-                 return (
-                   <label key={key} className="flex items-center space-x-3 cursor-pointer text-sm hover:bg-white hover:shadow-sm rounded-lg p-2 transition-all duration-200">
-                     <input
-                       type="checkbox"
-                       checked={visibleCategories[categoryKey]}
-                       onChange={() => toggleCategory(categoryKey)}
-                       className="rounded w-4 h-4"
-                     />
-                     <div 
-                       className="w-4 h-4 rounded-full border-2 border-white shadow-md"
-                       style={{ backgroundColor: iconColor }}
-                     ></div>
-                     <span className="text-xs sm:text-sm text-gray-800 font-medium">{label}</span>
-                   </label>
-                 );
-               })}
-             </div>
-           </div>
+    <div className="flex w-full h-[600px] bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200 relative">
+      {/* Tombol Toggle Filter */}
+      <button
+        onClick={toggleFilter}
+        className="absolute top-1/2 transform -translate-y-1/2 z-20 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-md transition-all duration-200 hover:shadow-lg"
+        style={{ left: isFilterVisible ? 'calc(58.33% + 4px)' : '4px' }}
+      >
+        <svg 
+          className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${isFilterVisible ? 'rotate-180' : ''}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {/* Filter Kategori - Kolom Kiri */}
+      <div className={`${isFilterVisible ? 'w-1/4' : 'w-0'} bg-gray-50 border-r border-gray-300 transition-all duration-300 overflow-hidden ${isFilterVisible ? 'p-4' : 'p-0'}`}>
+        <h4 className="text-lg font-semibold text-gray-800 mb-4">Filter Kategori</h4>
+        <div className="space-y-3">
+          {Object.entries(categoryLabels).map(([key, label]) => {
+            const categoryKey = key as keyof typeof visibleCategories;
+            const iconColor = {
+              market: '#10B981',
+              spbu: '#3B82F6',
+              agen: '#F59E0B',
+              pangkalan_lpg: '#EF4444',
+              spbe: '#8B5CF6'
+            }[categoryKey];
+            
+            return (
+              <label key={key} className="flex items-center space-x-3 cursor-pointer text-sm hover:bg-white hover:shadow-sm rounded-lg p-3 transition-all duration-200">
+                <input
+                  type="checkbox"
+                  checked={visibleCategories[categoryKey]}
+                  onChange={() => toggleCategory(categoryKey)}
+                  className="rounded w-4 h-4"
+                />
+                <div 
+                  className="w-4 h-4 rounded-full border-2 border-white shadow-md"
+                  style={{ backgroundColor: iconColor }}
+                ></div>
+                <span className="text-sm text-gray-800 font-medium">{label}</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Dropdown Konten - Kolom Tengah */}
+      <div className={`${isFilterVisible ? 'w-1/3' : 'w-0'} bg-white border-r border-gray-300 h-full transition-all duration-300 overflow-hidden`}>
+        <div className="p-4 space-y-4 h-full overflow-y-auto">
           
           {/* Market */}
            {visibleCategories.market && (
@@ -232,6 +261,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
                )}
              </div>
            )}
+
+
 
           {/* SPBU */}
            {visibleCategories.spbu && (
@@ -360,11 +391,12 @@ export default function MapSection({ selectedLocation }: MapProps) {
                )}
              </div>
            )}
-        </div>
+
+          </div>
       </div>
 
-      {/* Peta */}
-      <div className="flex-1 h-full relative">
+      {/* Peta - Kolom Kanan */}
+      <div className="flex-1 h-full relative transition-all duration-300">
         <div className="absolute inset-0 bg-gray-50 overflow-hidden">
           <MapContainer 
             center={mapCenter} 
@@ -372,6 +404,7 @@ export default function MapSection({ selectedLocation }: MapProps) {
             scrollWheelZoom={true} 
             style={{ height: '100%', width: '100%' }}
             className="z-10"
+            ref={mapRef}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
