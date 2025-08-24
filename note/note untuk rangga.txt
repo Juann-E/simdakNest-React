@@ -1,40 +1,48 @@
-1.  table baru
+saran data base
 
-        -- Table kecamatan
-        CREATE TABLE kecamatan (
-            id_kecamatan INT AUTO_INCREMENT PRIMARY KEY,
-            nama_kecamatan VARCHAR(100) NOT NULL,
-            keterangan TEXT
-        );
+    satuan barang
+        id satuan (pk)
+        satuan barang
+        time stamp
 
-        -- Tabel Kelurahan 
-        CREATE TABLE kelurahan (
-            id_kelurahan INT AUTO_INCREMENT PRIMARY KEY,
-            id_kecamatan INT NOT NULL,
-            nama_kelurahan VARCHAR(100) NOT NULL,
-            keterangan TEXT,
-            CONSTRAINT fk_kelurahan_kecamatan
-            FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan)
-            ON DELETE CASCADE
-        );
+    Kecamatan
+        id_kecamatan (pk)
+        nama Kecamatan
+        keterangan
 
-        -- table spbu
-        CREATE TABLE spbu (
-            id_spbu INT AUTO_INCREMENT PRIMARY KEY,
-            no_spbu VARCHAR(50) NOT NULL,
-            id_kecamatan INT NOT NULL,
-            id_kelurahan INT NOT NULL,
-            alamat TEXT NOT NULL,
-            latitude DECIMAL(10,7),
-            longitude DECIMAL(10,7),
-            telepon VARCHAR(50),
-            penanggung_jawab VARCHAR(100),
-            FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan),
-            FOREIGN KEY (id_kelurahan) REFERENCES kelurahan(id_kelurahan)
-        );
+    kelurahan
+        id_kelurahan (pk)
+        id_kecamatan (fk)
+        nama kelurahan
+        keterangan
 
-    ------------------- ini baru ---------------
-3.  ada informasi tambahan di Data Gambaran\cara pakai git.txt (note)
-4.  ada infromasi tambahan di note\cara install.txt (generate sandi)
-5.  nanti untuk yang dokumen_spbu di tabelnya kalau dijalakan programnya 
-    otomatis nambal kolom baru jadi tidak usah bingung alter table
+    Distributor
+        id_distributor (pk)
+        nama Distributor
+        nama kecamatan (fk)
+        nama_kelurahan (fk)
+        alamat
+        latitude
+        longtitute
+        keterangan
+
+    komoditas  
+    ---(satuan di komoditas isi sendiri tapi lebih baik di jadikan 1 saja dengan tabelnya satuan)
+        id_komoditas (pk)
+        nama_satuan (fk)
+        keterangan
+    
+    transasksi stock pangan
+        id transasksi(pk)
+        tahun --> aku gak tau kenapa dia kayak ambil dari database
+        bulan --> aku gak tau kenapa dia ambil dari database
+        nama komoditas (fk)
+        stock awal
+        pengadaan
+        penyaluran
+        keterangan
+        
+    Report 
+        cuman ambil dari bulan dan tahun
+
+    mau dibuat ambil dari data transasksi (???)
