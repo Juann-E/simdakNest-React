@@ -1,7 +1,7 @@
 // src/components/admin/Sidebar.tsx
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Boxes, LogOut, ChevronDown, Fuel, Settings } from 'lucide-react';
+import { LayoutDashboard, Boxes, LogOut, ChevronDown, Fuel, Settings, Package2 } from 'lucide-react';
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -15,12 +15,18 @@ export default function Sidebar() {
   
   // Cek apakah rute saat ini ada di dalam section Settings
   const isSettingsActive = location.pathname.startsWith('/admin/settings');
+  
+  // Cek apakah rute saat ini ada di dalam section Stock Pangan
+  const isStockPanganActive = location.pathname.startsWith('/admin/stock-pangan');
 
   // 1. Ubah state awal 'isKepokmasOpen' berdasarkan rute aktif
   const [isKepokmasOpen, setIsKepokmasOpen] = useState(isKepokmasActive);
   
   // State untuk menu SPBU LPG
   const [isSpbuLpgOpen, setIsSpbuLpgOpen] = useState(isSpbuLpgActive);
+  
+  // State untuk menu Stock Pangan
+  const [isStockPanganOpen, setIsStockPanganOpen] = useState(isStockPanganActive);
   
   // State untuk menu Settings
   const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsActive);
@@ -41,6 +47,13 @@ export default function Sidebar() {
       setIsSpbuLpgOpen(true);
     }
   }, [isSpbuLpgActive]);
+  
+  // Efek untuk membuka menu Stock Pangan secara otomatis jika pengguna menavigasi ke halamannya
+  useEffect(() => {
+    if (isStockPanganActive) {
+      setIsStockPanganOpen(true);
+    }
+  }, [isStockPanganActive]);
   
   // Efek untuk membuka menu Settings secara otomatis jika pengguna menavigasi ke halamannya
   useEffect(() => {
@@ -141,6 +154,37 @@ export default function Sidebar() {
             </NavLink>
             <NavLink to="/admin/spbu-lpg/spbe" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
               SPBE
+            </NavLink>
+          </div>
+        )}
+
+        <button 
+          onClick={() => setIsStockPanganOpen(!isStockPanganOpen)} 
+          className={`w-full flex items-center justify-between p-2 text-gray-700 rounded-lg hover:bg-gray-200 ${isStockPanganActive ? 'bg-gray-100' : ''}`}
+        >
+          <div className="flex items-center">
+            <Package2 className="w-5 h-5" />
+            <span className="ml-3">Stock Pangan</span>
+          </div>
+          <ChevronDown className={`w-5 h-5 transition-transform ${isStockPanganOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isStockPanganOpen && (
+          <div className="space-y-1 mt-1">
+            <NavLink to="/admin/stock-pangan/distributor" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Distributor
+            </NavLink>
+            <NavLink to="/admin/stock-pangan/satuan-barang" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Satuan Komoditas
+            </NavLink>
+            <NavLink to="/admin/stock-pangan/komoditas" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Komoditas
+            </NavLink>
+            <NavLink to="/admin/stock-pangan/transaksi-stock" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Transaksi Stock Pangan
+            </NavLink>
+            <NavLink to="/admin/stock-pangan/report" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
+              Report Stock Pangan
             </NavLink>
           </div>
         )}

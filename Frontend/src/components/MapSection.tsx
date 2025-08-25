@@ -27,6 +27,7 @@ const icons = {
   agen: createColoredIcon('#F59E0B'),   // Kuning
   pangkalan_lpg: createColoredIcon('#EF4444'), // Merah
   spbe: createColoredIcon('#8B5CF6'),   // Ungu
+  distributor: createColoredIcon('#EC4899'), // Pink
 };
 
 let DefaultIcon = L.icon({
@@ -42,7 +43,7 @@ interface Location {
   address: string;
   latitude: number;
   longitude: number;
-  type: 'market' | 'spbu' | 'agen' | 'pangkalan_lpg' | 'spbe';
+  type: 'market' | 'spbu' | 'agen' | 'pangkalan_lpg' | 'spbe' | 'distributor';
 }
 
 interface LocationData {
@@ -51,6 +52,7 @@ interface LocationData {
   agen: Location[];
   pangkalanLpg: Location[];
   spbe: Location[];
+  distributors: Location[];
 }
 
 interface MapProps {
@@ -74,7 +76,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: [],
     agen: [],
     pangkalanLpg: [],
-    spbe: []
+    spbe: [],
+    distributors: []
   });
   const [loading, setLoading] = useState(true);
   const [visibleCategories, setVisibleCategories] = useState({
@@ -82,7 +85,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: true,
     agen: true,
     pangkalan_lpg: true,
-    spbe: true
+    spbe: true,
+    distributor: true
   });
   const [selectedMarker, setSelectedMarker] = useState<Location | null>(null);
   const [hoveredMarker, setHoveredMarker] = useState<Location | null>(null);
@@ -92,7 +96,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: false,
     agen: false,
     pangkalan_lpg: false,
-    spbe: false
+    spbe: false,
+    distributor: false
   });
   const [isFilterVisible, setIsFilterVisible] = useState(true);
   const mapRef = useRef<any>(null);
@@ -124,7 +129,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
     ...(visibleCategories.spbu ? locations.spbu : []),
     ...(visibleCategories.agen ? locations.agen : []),
     ...(visibleCategories.pangkalan_lpg ? locations.pangkalanLpg : []),
-    ...(visibleCategories.spbe ? locations.spbe : [])
+    ...(visibleCategories.spbe ? locations.spbe : []),
+    ...(visibleCategories.distributor ? locations.distributors : [])
   ];
 
   const categoryLabels = {
@@ -132,7 +138,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
     spbu: 'SPBU',
     agen: 'Agen',
     pangkalan_lpg: 'Pangkalan LPG',
-    spbe: 'SPBE'
+    spbe: 'SPBE',
+    distributor: 'Distributor'
   };
 
   const toggleCategory = (category: keyof typeof visibleCategories) => {
@@ -204,7 +211,8 @@ export default function MapSection({ selectedLocation }: MapProps) {
               spbu: '#3B82F6',
               agen: '#F59E0B',
               pangkalan_lpg: '#EF4444',
-              spbe: '#8B5CF6'
+              spbe: '#8B5CF6',
+              distributor: '#EC4899'
             }[categoryKey];
             
             return (
@@ -392,6 +400,38 @@ export default function MapSection({ selectedLocation }: MapProps) {
              </div>
            )}
 
+           {/* Distributor */}
+           {visibleCategories.distributor && (
+             <div className="mb-5">
+               <button
+                 onClick={() => toggleCategoryExpansion('distributor')}
+                 className="flex items-center justify-between w-full p-4 bg-pink-50 hover:bg-pink-100 hover:shadow-md rounded-xl transition-all duration-300 transform hover:scale-[1.02]"
+               >
+                 <div className="flex items-center space-x-2 sm:space-x-3">
+                   <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-pink-500 shadow-sm"></div>
+                   <span className="font-semibold text-gray-800 text-sm sm:text-base">Distributor ({locations.distributors.length})</span>
+                 </div>
+                 <svg className={`w-6 h-6 transform transition-all duration-300 ${expandedCategories.distributor ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                 </svg>
+               </button>
+               {expandedCategories.distributor && (
+                 <div className="mt-3 space-y-2 animate-in slide-in-from-top-2 duration-300">
+                   {locations.distributors.map((location) => (
+                     <button
+                       key={location.id}
+                       onClick={() => handleLocationClick(location)}
+                       className="w-full text-left p-3 hover:bg-pink-50 hover:shadow-sm rounded-lg text-sm text-gray-700 border-l-4 border-pink-500 ml-2 transition-all duration-200 transform hover:translate-x-1"
+                     >
+                       <div className="font-semibold text-gray-800">{location.name}</div>
+                       <div className="text-xs text-gray-500 mt-1 leading-relaxed">{location.address}</div>
+                     </button>
+                   ))}
+                 </div>
+               )}
+             </div>
+           )}
+
           </div>
       </div>
 
@@ -424,6 +464,7 @@ export default function MapSection({ selectedLocation }: MapProps) {
                   agen: '#D97706',   // Kuning lebih gelap
                   pangkalan_lpg: '#DC2626', // Merah lebih gelap
                   spbe: '#7C3AED',   // Ungu lebih gelap
+                  distributor: '#BE185D', // Pink lebih gelap
                 }[location.type]) : icons[location.type];
               
               // Skip marker jika kategori tidak visible

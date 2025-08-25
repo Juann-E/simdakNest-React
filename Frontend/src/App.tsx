@@ -10,6 +10,7 @@ import DashboardPage from './pages/admin/DashboardPage';
 import Header from './components/Header';
 import KepokmasPage from './pages/admin/KepokmasPage';
 import SpbuLpgPage from './pages/admin/SpbuLpgPage';
+import StockPanganPage from './pages/admin/StockPanganPage';
 import SettingsPage from './pages/admin/SettingsPage';
 import GridDetailPage from './components/admin/kepokmas/GridDetailPage';
 import HargaGridDetailPage from './components/admin/kepokmas/harga_barang_grid/HargaGridDetailPage';
@@ -73,6 +74,9 @@ function App() {
         {/* Rute untuk SPBU LPG */}
         <Route path="spbu-lpg/:tab" element={<SpbuLpgPage />} />
 
+        {/* Rute untuk Stock Pangan */}
+        <Route path="stock-pangan/:tab" element={<StockPanganPage />} />
+
         {/* Rute untuk Settings */}
         <Route path="settings/:tab" element={<SettingsPage />} />
 
@@ -93,6 +97,12 @@ function App() {
         <Route
           path="spbu-lpg"
           element={<Navigate to="/admin/spbu-lpg/spbu" replace />}
+        />
+        
+        {/* Tambahkan redirect agar /admin/stock-pangan otomatis ke tab pertama */}
+        <Route
+          path="stock-pangan"
+          element={<Navigate to="/admin/stock-pangan/distributor" replace />}
         />
         
         {/* Tambahkan redirect agar /admin/settings otomatis ke tab pertama */}

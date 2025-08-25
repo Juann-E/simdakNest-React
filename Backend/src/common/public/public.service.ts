@@ -9,6 +9,7 @@ import { Spbu } from '../../modules/SPBU_LPG/SPBU/spbu.entity';
 import { Agen } from '../../modules/SPBU_LPG/Agen/agen.entity';
 import { PangkalanLpg } from '../../modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.entity';
 import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
+import { Distributor } from '../../modules/StockPangan/Distributor/distributor.entity';
 
 @Injectable()
 export class PublicService {
@@ -25,6 +26,8 @@ export class PublicService {
     private readonly pangkalanLpgRepo: Repository<PangkalanLpg>,
     @InjectRepository(Spbe)
     private readonly spbeRepo: Repository<Spbe>,
+    @InjectRepository(Distributor)
+    private readonly distributorRepo: Repository<Distributor>,
   ) {}
 
   /**
@@ -137,7 +140,7 @@ export class PublicService {
    * Mengambil semua data lokasi untuk peta dengan koordinat
    */
   async getAllLocations() {
-     const [markets, spbu, agen, pangkalanLpg, spbe] = await Promise.all([
+     const [markets, spbu, agen, pangkalanLpg, spbe, distributors] = await Promise.all([
        this.pasarRepo.createQueryBuilder('pasar')
          .where('pasar.latitude IS NOT NULL')
          .andWhere('pasar.longitude IS NOT NULL')
@@ -161,6 +164,10 @@ export class PublicService {
          .where('spbe.latitude IS NOT NULL')
          .andWhere('spbe.longitude IS NOT NULL')
          .andWhere('spbe.status = :status', { status: 'Aktif' })
+         .getMany(),
+       this.distributorRepo.createQueryBuilder('distributor')
+         .where('distributor.latitude IS NOT NULL')
+         .andWhere('distributor.longitude IS NOT NULL')
          .getMany()
      ]);
 
@@ -204,6 +211,14 @@ export class PublicService {
         latitude: item.latitude,
         longitude: item.longitude,
         type: 'spbe'
+      })),
+      distributors: distributors.map(item => ({
+        id: item.id,
+        name: item.nama_distributor,
+        address: item.alamat,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        type: 'distributor'
       }))
     };
   }

@@ -34,8 +34,8 @@ saran data base
     
     transasksi stock pangan
         id transasksi(pk)
-        tahun --> aku gak tau kenapa dia kayak ambil dari database
-        bulan --> aku gak tau kenapa dia ambil dari database
+        tahun 
+        bulan 
         nama komoditas (fk)
         stock awal
         pengadaan

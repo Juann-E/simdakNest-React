@@ -13,6 +13,7 @@ import { Spbu } from '../../modules/SPBU_LPG/SPBU/spbu.entity';
 import { Agen } from '../../modules/SPBU_LPG/Agen/agen.entity';
 import { PangkalanLpg } from '../../modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.entity';
 import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
+import { Distributor } from '../../modules/StockPangan/Distributor/distributor.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
       rootPath: join(process.cwd(), 'uploads'),
       // serveRoot secara default adalah '/', ini berarti URL akan mengikuti struktur folder
     }),
-    TypeOrmModule.forFeature([NamaPasar, HargaBarangPasar, BarangPasarGrid, Spbu, Agen, PangkalanLpg, Spbe]),
+    TypeOrmModule.forFeature([NamaPasar, HargaBarangPasar, BarangPasarGrid, Spbu, Agen, PangkalanLpg, Spbe, Distributor]),
   ],
   controllers: [PublicController],
   providers: [PublicService],

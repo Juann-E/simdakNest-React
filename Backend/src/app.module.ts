@@ -31,6 +31,9 @@ import { AgenModule } from './modules/SPBU_LPG/Agen/agen.module';
 import { PangkalanLpgModule } from './modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.module';
 import { SpbeModule } from './modules/SPBU_LPG/Spbe/spbe.module';
 
+// Stock Pangan Modules
+import { StockPanganModule } from './modules/stock-pangan/stock-pangan.module';
+
 // Common / Public Modules
 import { PublicModule } from './common/public/public.module';
 
@@ -54,7 +57,7 @@ import { PublicModule } from './common/public/public.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false
     }),
 
     // upload gamabr
@@ -84,6 +87,9 @@ import { PublicModule } from './common/public/public.module';
     AgenModule,
     PangkalanLpgModule,
     SpbeModule,
+
+    // Stock Pangan Modules
+    StockPanganModule,
     
     // Public access module
     PublicModule,
