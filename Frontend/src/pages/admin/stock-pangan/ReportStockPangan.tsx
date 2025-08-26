@@ -3,23 +3,14 @@ import { DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
 interface MonthlyReportForm {
-  tahun: number;
-  bulan: number;
+  monthYear: string;
 }
 
 const ReportStockPangan: React.FC = () => {
   const [monthlyForm, setMonthlyForm] = useState<MonthlyReportForm>({
-    tahun: new Date().getFullYear(),
-    bulan: new Date().getMonth() + 1
+    monthYear: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
   });
   const [isDownloadingMonthly, setIsDownloadingMonthly] = useState(false);
-
-  const bulanNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-  ];
-
-
 
   // Download monthly Excel report
   const downloadMonthlyExcel = async () => {
@@ -29,18 +20,20 @@ const ReportStockPangan: React.FC = () => {
       return;
     }
 
-    if (!monthlyForm.tahun || !monthlyForm.bulan) {
+    if (!monthlyForm.monthYear) {
       console.warn('Mohon pilih tahun dan bulan terlebih dahulu');
       return;
     }
+
+    const [year, month] = monthlyForm.monthYear.split('-').map(Number);
 
     setIsDownloadingMonthly(true);
     try {
       const response = await axios.post(
         'http://localhost:3000/stock-pangan/report/monthly-excel',
         {
-          tahun: monthlyForm.tahun,
-          bulan: monthlyForm.bulan
+          tahun: year,
+          bulan: month
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -52,7 +45,7 @@ const ReportStockPangan: React.FC = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `data_stock_pangan_${String(monthlyForm.bulan).padStart(2, '0')}_${monthlyForm.tahun}.xlsx`);
+      link.setAttribute('download', `data_stock_pangan_${String(month).padStart(2, '0')}_${year}.xlsx`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -67,35 +60,9 @@ const ReportStockPangan: React.FC = () => {
   };
 
   // Handle monthly form change
-  const handleMonthlyFormChange = (field: keyof MonthlyReportForm, value: number) => {
-    setMonthlyForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleMonthlyFormChange = (value: string) => {
+    setMonthlyForm({ monthYear: value });
   };
-
-  // Generate month options
-  const monthOptions = [
-    { value: 1, label: 'Januari' },
-    { value: 2, label: 'Februari' },
-    { value: 3, label: 'Maret' },
-    { value: 4, label: 'April' },
-    { value: 5, label: 'Mei' },
-    { value: 6, label: 'Juni' },
-    { value: 7, label: 'Juli' },
-    { value: 8, label: 'Agustus' },
-    { value: 9, label: 'September' },
-    { value: 10, label: 'Oktober' },
-    { value: 11, label: 'November' },
-    { value: 12, label: 'Desember' }
-  ];
-
-  // Generate year options (current year ± 5 years)
-  const currentYear = new Date().getFullYear();
-  const yearOptions = [];
-  for (let i = currentYear - 5; i <= currentYear + 5; i++) {
-    yearOptions.push({ value: i, label: i.toString() });
-  }
 
 
 
@@ -115,39 +82,17 @@ const ReportStockPangan: React.FC = () => {
           Download laporan stock pangan dalam format Excel yang dikelompokkan berdasarkan komoditas dengan perhitungan stock akhir otomatis.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tahun
+              Tanggal Mulai
             </label>
-            <select
-              value={monthlyForm.tahun}
-              onChange={(e) => handleMonthlyFormChange('tahun', parseInt(e.target.value))}
+            <input
+              type="month"
+              value={monthlyForm.monthYear}
+              onChange={(e) => handleMonthlyFormChange(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {yearOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bulan
-            </label>
-            <select
-              value={monthlyForm.bulan}
-              onChange={(e) => handleMonthlyFormChange('bulan', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {monthOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           
           <div>

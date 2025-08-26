@@ -160,31 +160,20 @@ export default function StockPanganDetailPage() {
 
                 {/* Dropdown for Month/Year Selection */}
                 {showDropdown && (
-                  <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg z-10 min-w-[200px]">
+                  <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg z-10 min-w-[250px]">
                     <div className="p-4">
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
-                        <select
-                          value={selectedYear}
-                          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                          className="w-full p-2 border rounded-md"
-                        >
-                          {getAvailableYears().map(year => (
-                            <option key={year} value={year}>{year}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Bulan</label>
-                        <select
-                          value={selectedMonth}
-                          onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                          className="w-full p-2 border rounded-md"
-                        >
-                          {monthNames.map((month, index) => (
-                            <option key={index + 1} value={index + 1}>{month}</option>
-                          ))}
-                        </select>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pilih Bulan dan Tahun</label>
+                        <input
+                          type="month"
+                          value={`${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`}
+                          onChange={(e) => {
+                            const [year, month] = e.target.value.split('-');
+                            setSelectedYear(parseInt(year));
+                            setSelectedMonth(parseInt(month));
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                       </div>
                       <button
                         onClick={() => setShowDropdown(false)}
