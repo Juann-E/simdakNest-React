@@ -168,7 +168,7 @@ const Komoditas: React.FC = () => {
       keterangan: item.keterangan || '',
       gambar: null
     });
-    setImagePreview(item.gambar ? `${API_BASE_URL}/uploads/komoditas/${item.gambar.split('/').pop()}` : null);
+    setImagePreview(item.gambar ? `${API_BASE_URL}/uploads/${item.gambar.replace(/\\/g, '/').replace('uploads/', '')}` : null);
     setIsModalOpen(true);
   };
 
@@ -274,7 +274,7 @@ const Komoditas: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.gambar ? (
                         <img
-                          src={`${API_BASE_URL}/uploads/komoditas/${item.gambar}`}
+                          src={`${API_BASE_URL}/uploads/${item.gambar.replace(/\\/g, '/').replace('uploads/', '')}`}
                           alt={item.komoditas}
                           className="h-12 w-12 object-cover rounded-lg"
                         />

@@ -60,10 +60,11 @@ import { PublicModule } from './common/public/public.module';
       synchronize: false
     }),
 
-    // upload gamabr
+    // upload gambar
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads', // URL prefix
+      exclude: ['/api*', '/public*'], // Exclude API routes
     }),
 
     // Core application modules

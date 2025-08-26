@@ -85,11 +85,11 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 h-screen bg-white border-r fixed top-0 left-0 flex flex-col">
-      <div className="p-4 border-b">
+      <div className="p-4 border-b flex-shrink-0">
         <h1 className="text-xl font-bold text-blue-600">SIMDAG Admin</h1>
         <p className="text-sm text-gray-500">Dashboard Administrasi</p>
       </div>
-      <nav className="flex-grow p-4 space-y-2">
+      <nav className="flex-grow p-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         <p className="px-2 text-xs font-semibold text-gray-400 uppercase">Menu Utama</p>
         <NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? activeLinkClass : linkClass}>
           <LayoutDashboard className="w-5 h-5" />
@@ -186,6 +186,7 @@ export default function Sidebar() {
             <NavLink to="/admin/stock-pangan/report" className={({ isActive }) => isActive ? activeSubLinkClass : subLinkClass}>
               Report Stock Pangan
             </NavLink>
+
           </div>
         )}
 
@@ -213,7 +214,7 @@ export default function Sidebar() {
       </nav>
       
       {/* --- 3. Bagian Akun & Logout yang Diperbarui --- */}
-      <div className="p-4 border-t mt-auto relative">
+      <div className="p-4 border-t flex-shrink-0 relative">
         {/* Menu pop-up untuk logout */}
         {isAccountMenuOpen && (
           <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border rounded-lg shadow-lg p-1 transition-all">

@@ -8,6 +8,8 @@ import HeroSection from "../components/HeroSection"
 import FeatureCarousel from "../components/FeatureCarousel"
 import MapSection from "../components/MapSection"
 import PriceChart from "../components/PriceChart"
+import StockPanganChart from "../components/StockPanganChart"
+import StockPanganSection from "../components/StockPanganSection"
 import Footer from "../components/Footer"
 
 // Pastikan URL ini sesuai dengan alamat backend Anda
@@ -37,8 +39,8 @@ export default function MarketListPage() {
           let imageUrl = "/default-market.jpg" // Gambar default jika tidak ada gambar
           if (market.gambar) {
             // Membersihkan path gambar dari backend
-            const cleanedPath = market.gambar.replace(/\\/g, "/").replace("uploads/", "")
-            imageUrl = `${API_BASE_URL}/${cleanedPath}`
+            const cleanedPath = market.gambar.replace(/\\/g, "/")
+            imageUrl = `${API_BASE_URL}/uploads/${cleanedPath.replace("uploads/", "")}`
           }
           return { ...market, imageUrl }
         })
@@ -106,6 +108,22 @@ export default function MarketListPage() {
         </section>
         {/* === AKHIR BAGIAN GRAFIK HARGA === */}
 
+        {/* === BAGIAN GRAFIK STOCK PANGAN === */}
+        <section className="flex-shrink-0 w-full bg-gray-100 border-t border-gray-200 mt-12">
+          <div className="container mx-auto px-4 sm:px-6 py-16">
+            <div className="text-center space-y-4 mb-12">
+              <h3 className="text-4xl font-bold text-gray-800">Tren Stock Komoditas Pangan</h3>
+              <p className="text-xl text-gray-500 max-w-3xl mx-auto">
+                Pantau pergerakan stock komoditas pangan berdasarkan data transaksi distributor.
+              </p>
+            </div>
+            <div className="mb-8 bg-white rounded-lg p-4 w-full">
+              <StockPanganChart />
+            </div>
+          </div>
+        </section>
+        {/* === AKHIR BAGIAN GRAFIK STOCK PANGAN === */}
+
         {/* === BAGIAN DAFTAR PASAR === */}
         <section className="flex-shrink-0 container mx-auto px-4 py-16 mt-8">
           <div className="text-center mb-12">
@@ -145,6 +163,10 @@ export default function MarketListPage() {
           </div>
         </section>
         {/* === AKHIR BAGIAN DAFTAR PASAR === */}
+
+        {/* === BAGIAN STOCK PANGAN === */}
+        <StockPanganSection />
+        {/* === AKHIR BAGIAN STOCK PANGAN === */}
       </div>
 
       <Footer />

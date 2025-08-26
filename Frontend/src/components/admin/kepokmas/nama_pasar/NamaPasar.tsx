@@ -21,8 +21,8 @@ const API_BASE_URL = 'http://localhost:3000';
 
 const createImageUrl = (path?: string) => {
   if (!path) return null;
-  const cleanedPath = path.replace(/\\/g, '/').replace('uploads/', '');
-  return `${API_BASE_URL}/${cleanedPath}`;
+  const cleanedPath = path.replace(/\\/g, '/');
+  return `${API_BASE_URL}/uploads/${cleanedPath.replace('uploads/', '')}`;
 };
 
 export default function NamaPasar() {

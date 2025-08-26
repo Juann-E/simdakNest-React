@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 
 interface Distributor {
   id: number;
@@ -69,7 +68,7 @@ const TransaksiStockPangan: React.FC = () => {
   const fetchTransaksiItems = async () => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      Swal.fire('Error', 'Autentikasi gagal. Silakan login kembali.', 'error');
+      console.error('Autentikasi gagal. Silakan login kembali.');
       return;
     }
     
@@ -81,7 +80,6 @@ const TransaksiStockPangan: React.FC = () => {
       setFilteredItems(response.data);
     } catch (error) {
       console.error('Error fetching transaksi items:', error);
-      Swal.fire('Error', 'Gagal mengambil data transaksi', 'error');
     }
   };
 
@@ -144,7 +142,7 @@ const TransaksiStockPangan: React.FC = () => {
 
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      Swal.fire('Error', 'Sesi berakhir, silakan login kembali.', 'error');
+      console.error('Sesi berakhir, silakan login kembali.');
       setIsLoading(false);
       return;
     }
@@ -154,10 +152,10 @@ const TransaksiStockPangan: React.FC = () => {
       
       if (editingItem) {
         await axios.patch(`http://localhost:3000/transaksi-stock-pangan/${editingItem.idTransaksi}`, formData, { headers });
-        Swal.fire('Berhasil', 'Transaksi berhasil diperbarui', 'success');
+        console.log('Transaksi berhasil diperbarui');
       } else {
         await axios.post('http://localhost:3000/transaksi-stock-pangan', formData, { headers });
-        Swal.fire('Berhasil', 'Transaksi berhasil ditambahkan', 'success');
+        console.log('Transaksi berhasil ditambahkan');
       }
       
       fetchTransaksiItems();
@@ -165,7 +163,6 @@ const TransaksiStockPangan: React.FC = () => {
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error saving transaksi:', error);
-      Swal.fire('Error', 'Gagal menyimpan transaksi', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -187,33 +184,23 @@ const TransaksiStockPangan: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data transaksi akan dihapus permanen!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal'
-    });
+    const confirmed = window.confirm('Apakah Anda yakin ingin menghapus transaksi ini?');
 
-    if (result.isConfirmed) {
+    if (confirmed) {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        Swal.fire('Error', 'Sesi berakhir, silakan login kembali.', 'error');
+        console.error('Sesi berakhir, silakan login kembali.');
         return;
       }
-      
+
       try {
         await axios.delete(`http://localhost:3000/transaksi-stock-pangan/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        Swal.fire('Terhapus!', 'Transaksi berhasil dihapus.', 'success');
+        console.log('Transaksi berhasil dihapus');
         fetchTransaksiItems();
       } catch (error) {
         console.error('Error deleting transaksi:', error);
-        Swal.fire('Error', 'Gagal menghapus transaksi', 'error');
       }
     }
   };
@@ -445,8 +432,8 @@ const TransaksiStockPangan: React.FC = () => {
                       step="0.01"
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.stockAwal}
-                      onChange={(e) => setFormData({ ...formData, stockAwal: parseFloat(e.target.value) })}
+                      value={formData.stockAwal === 0 ? '' : formData.stockAwal}
+                      onChange={(e) => setFormData({ ...formData, stockAwal: parseFloat(e.target.value) || 0 })}
                     />
                   </div>
                   <div>
@@ -457,8 +444,8 @@ const TransaksiStockPangan: React.FC = () => {
                       step="0.01"
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.pengadaan}
-                      onChange={(e) => setFormData({ ...formData, pengadaan: parseFloat(e.target.value) })}
+                      value={formData.pengadaan === 0 ? '' : formData.pengadaan}
+                      onChange={(e) => setFormData({ ...formData, pengadaan: parseFloat(e.target.value) || 0 })}
                     />
                   </div>
                   <div>
@@ -469,8 +456,8 @@ const TransaksiStockPangan: React.FC = () => {
                       step="0.01"
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.penyaluran}
-                      onChange={(e) => setFormData({ ...formData, penyaluran: parseFloat(e.target.value) })}
+                      value={formData.penyaluran === 0 ? '' : formData.penyaluran}
+                      onChange={(e) => setFormData({ ...formData, penyaluran: parseFloat(e.target.value) || 0 })}
                     />
                   </div>
                 </div>

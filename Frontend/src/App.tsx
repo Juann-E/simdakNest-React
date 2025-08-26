@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 // Impor semua halaman dan komponen
 import MarketListPage from './pages/MarketListPage';
 import MarketDetailPage from './pages/MarketDetailPage';
+import StockPanganDetailPage from './pages/StockPanganDetailPage';
 import LoginPage from './pages/LoginPage';
 import Sidebar from './components/admin/Sidebar';
 import DashboardPage from './pages/admin/DashboardPage';
@@ -62,6 +63,7 @@ function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<MarketListPage />} />
         <Route path="/market/:marketId" element={<MarketDetailPage />} />
+        <Route path="/distributor/:distributorId" element={<StockPanganDetailPage />} />
       </Route>
 
       {/* Rute Admin yang Terproteksi */}

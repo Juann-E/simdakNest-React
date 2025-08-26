@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 
 interface MonthlyReportForm {
   tahun: number;
@@ -26,12 +25,12 @@ const ReportStockPangan: React.FC = () => {
   const downloadMonthlyExcel = async () => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      Swal.fire('Error', 'Sesi berakhir, silakan login kembali.', 'error');
+      console.error('Sesi berakhir, silakan login kembali.');
       return;
     }
 
     if (!monthlyForm.tahun || !monthlyForm.bulan) {
-      Swal.fire('Warning', 'Mohon pilih tahun dan bulan terlebih dahulu', 'warning');
+      console.warn('Mohon pilih tahun dan bulan terlebih dahulu');
       return;
     }
 
@@ -59,10 +58,9 @@ const ReportStockPangan: React.FC = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      Swal.fire('Berhasil', 'Laporan Excel berhasil diunduh', 'success');
+      console.log('Laporan Excel berhasil diunduh');
     } catch (error) {
       console.error('Error downloading monthly excel:', error);
-      Swal.fire('Error', 'Gagal mengunduh laporan Excel', 'error');
     } finally {
       setIsDownloadingMonthly(false);
     }

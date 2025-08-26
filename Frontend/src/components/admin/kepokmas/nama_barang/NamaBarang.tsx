@@ -22,8 +22,8 @@ const ITEMS_PER_PAGE = 10; // Tentukan jumlah item per halaman
 
 const createImageUrl = (path?: string) => {
   if (!path) return null;
-  const cleanedPath = path.replace(/\\/g, '/').replace('uploads/', '');
-  return `${API_BASE_URL}/${cleanedPath}`;
+  const cleanedPath = path.replace(/\\/g, '/');
+  return `${API_BASE_URL}/uploads/${cleanedPath.replace('uploads/', '')}`;
 };
 
 export default function NamaBarang() {

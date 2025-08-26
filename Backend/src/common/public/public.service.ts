@@ -2,7 +2,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { NamaPasar } from '../../modules/Kepokmas/nama-pasar/nama-pasar.entity';
 import { HargaBarangPasar } from '../../modules/Kepokmas/harga-barang-grid/harga-barang-pasar.entity';
 import { Spbu } from '../../modules/SPBU_LPG/SPBU/spbu.entity';
@@ -10,6 +10,9 @@ import { Agen } from '../../modules/SPBU_LPG/Agen/agen.entity';
 import { PangkalanLpg } from '../../modules/SPBU_LPG/PangkalanLpg/pangkalan-lpg.entity';
 import { Spbe } from '../../modules/SPBU_LPG/Spbe/spbe.entity';
 import { Distributor } from '../../modules/StockPangan/Distributor/distributor.entity';
+import { NamaBarang } from '../../modules/Kepokmas/nama-barang/nama-barang.entity';
+import { KomoditasStockPangan } from '../../modules/StockPangan/Komoditas/komoditas.entity';
+import { TransaksiStockPangan } from '../../modules/StockPangan/TransaksiStockPangan/transaksi-stock-pangan.entity';
 
 @Injectable()
 export class PublicService {
@@ -28,6 +31,12 @@ export class PublicService {
     private readonly spbeRepo: Repository<Spbe>,
     @InjectRepository(Distributor)
     private readonly distributorRepo: Repository<Distributor>,
+    @InjectRepository(NamaBarang)
+    private readonly namaBarangRepo: Repository<NamaBarang>,
+    @InjectRepository(KomoditasStockPangan)
+    private readonly komoditasStockPanganRepo: Repository<KomoditasStockPangan>,
+    @InjectRepository(TransaksiStockPangan)
+    private readonly transaksiStockPanganRepo: Repository<TransaksiStockPangan>,
   ) {}
 
   /**
@@ -137,6 +146,152 @@ export class PublicService {
   }
 
   /**
+   * Mengambil statistik dashboard untuk admin
+   */
+  async getDashboardStats() {
+    const [marketCount, spbuCount, agenCount, pangkalanLpgCount, spbeCount, distributorCount, komoditasKepokmasCount, komoditasStockPanganCount] = await Promise.all([
+      this.pasarRepo.count(),
+      this.spbuRepo.count(),
+      this.agenRepo.count(),
+      this.pangkalanLpgRepo.count(),
+      this.spbeRepo.count(),
+      this.distributorRepo.count(),
+      this.namaBarangRepo.count(),
+      this.komoditasStockPanganRepo.count(),
+    ]);
+
+    return {
+      markets: marketCount,
+      spbu: spbuCount,
+      agen: agenCount,
+      pangkalanLpg: pangkalanLpgCount,
+      spbe: spbeCount,
+      distributors: distributorCount,
+      komoditasKepokmas: komoditasKepokmasCount,
+      komoditasStockPangan: komoditasStockPanganCount,
+    };
+  }
+
+  /**
+   * Mengambil statistik Stock Pangan untuk dashboard khusus
+   */
+  async getStockPanganStats() {
+    const [distributorCount, komoditasCount, transaksiCount, totalStockAwal, totalPengadaan, totalPenyaluran] = await Promise.all([
+      this.distributorRepo.count(),
+      this.komoditasStockPanganRepo.count(),
+      this.transaksiStockPanganRepo.count(),
+      this.transaksiStockPanganRepo
+        .createQueryBuilder('transaksi')
+        .select('SUM(transaksi.stock_awal)', 'total')
+        .getRawOne()
+        .then(result => parseInt(result.total) || 0),
+      this.transaksiStockPanganRepo
+        .createQueryBuilder('transaksi')
+        .select('SUM(transaksi.pengadaan)', 'total')
+        .getRawOne()
+        .then(result => parseInt(result.total) || 0),
+      this.transaksiStockPanganRepo
+        .createQueryBuilder('transaksi')
+        .select('SUM(transaksi.penyaluran)', 'total')
+        .getRawOne()
+        .then(result => parseInt(result.total) || 0),
+    ]);
+
+    const stockAkhir = totalStockAwal + totalPengadaan - totalPenyaluran;
+
+    return {
+      distributors: distributorCount,
+      komoditas: komoditasCount,
+      transaksi: transaksiCount,
+      stockAwal: totalStockAwal,
+      pengadaan: totalPengadaan,
+      penyaluran: totalPenyaluran,
+      stockAkhir: stockAkhir,
+    };
+  }
+
+  /**
+   * Mengambil data chart Stock Pangan berdasarkan transaksi bulanan
+   */
+  async getStockPanganChartData() {
+    const allTransaksi = await this.transaksiStockPanganRepo.find({
+      relations: ['komoditas', 'distributor'],
+      order: { tahun: 'DESC', bulan: 'DESC' }
+    });
+
+    if (allTransaksi.length === 0) {
+      return { chartData: [], chartLines: [] };
+    }
+
+    // Ambil 6 bulan terakhir berdasarkan tahun dan bulan
+    const monthlyData = new Map<string, any>();
+    allTransaksi.forEach(t => {
+      const monthKey = `${t.tahun}-${t.bulan.toString().padStart(2, '0')}`;
+      if (!monthlyData.has(monthKey)) {
+        monthlyData.set(monthKey, {
+          tahun: t.tahun,
+          bulan: t.bulan,
+          transaksi: []
+        });
+      }
+      monthlyData.get(monthKey).transaksi.push(t);
+    });
+
+    // Ambil 6 bulan terakhir
+    const recentMonths = [...monthlyData.keys()]
+        .sort((a, b) => b.localeCompare(a))
+        .slice(0, 6)
+        .reverse();
+
+    const recentTransaksi = recentMonths.flatMap(monthKey => monthlyData.get(monthKey).transaksi);
+    
+    // Hitung frekuensi komoditas untuk menentukan top 5
+    const komoditasFrequency = new Map<string, number>();
+    recentTransaksi.forEach(t => {
+        const komoditasName = t.komoditas?.komoditas;
+        if (komoditasName) {
+            komoditasFrequency.set(komoditasName, (komoditasFrequency.get(komoditasName) || 0) + 1);
+        }
+    });
+
+    const topKomoditas = [...komoditasFrequency.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(entry => entry[0]);
+
+    // Kelompokkan data berdasarkan bulan
+    const groupedByMonth: { [key: string]: any } = {};
+    const bulanNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    
+    recentMonths.forEach(monthKey => {
+      const monthData = monthlyData.get(monthKey);
+      const monthLabel = `${bulanNames[monthData.bulan - 1]} ${monthData.tahun}`;
+      groupedByMonth[monthKey] = { month: monthLabel };
+    });
+
+    // Agregasi data per bulan dan komoditas (total stock akhir)
+    recentTransaksi.forEach(t => {
+      const monthKey = `${t.tahun}-${t.bulan.toString().padStart(2, '0')}`;
+      const komoditasName = t.komoditas?.komoditas;
+      if (groupedByMonth[monthKey] && topKomoditas.includes(komoditasName)) {
+        const stockAkhir = (t.stock_awal || 0) + (t.pengadaan || 0) - (t.penyaluran || 0);
+        if (!groupedByMonth[monthKey][komoditasName]) {
+            groupedByMonth[monthKey][komoditasName] = stockAkhir;
+        } else {
+            groupedByMonth[monthKey][komoditasName] += stockAkhir;
+        }
+      }
+    });
+    
+    const formattedChartData = recentMonths.map(monthKey => groupedByMonth[monthKey]);
+    
+    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
+    const chartLines = topKomoditas.map((key, index) => ({ key, color: colors[index % colors.length] }));
+
+    return { chartData: formattedChartData, chartLines };
+  }
+
+  /**
    * Mengambil semua data lokasi untuk peta dengan koordinat
    */
   async getAllLocations() {
@@ -221,5 +376,86 @@ export class PublicService {
         type: 'distributor'
       }))
     };
+  }
+
+  /**
+   * Mengambil semua data distributor stock pangan untuk halaman publik.
+   */
+  async findAllDistributors() {
+    const distributors = await this.distributorRepo.find({
+      select: ['id', 'nama_distributor', 'alamat', 'latitude', 'longitude']
+    });
+
+    return distributors.map(distributor => ({
+      id: distributor.id,
+      nama_distributor: distributor.nama_distributor,
+      alamat: distributor.alamat,
+      latitude: distributor.latitude,
+      longitude: distributor.longitude,
+      status: 'Aktif'
+    }));
+  }
+
+  /**
+   * Mengambil data stock bulanan untuk distributor tertentu.
+   */
+  async getDistributorStockMonthly(distributorId: number) {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    
+    // Ambil data transaksi 6 bulan terakhir
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    const transaksi = await this.transaksiStockPanganRepo.find({
+      where: {
+        distributor: { id: distributorId },
+        timeStamp: MoreThanOrEqual(sixMonthsAgo)
+      },
+      relations: ['distributor', 'komoditas'],
+      order: { timeStamp: 'DESC' }
+    });
+
+    // Group data by month and komoditas
+    const monthlyData = new Map<string, any>();
+    
+    transaksi.forEach(t => {
+      const date = new Date(t.timeStamp);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const komoditasName = t.komoditas.komoditas;
+      
+      if (!monthlyData.has(monthKey)) {
+        monthlyData.set(monthKey, {
+          month: monthKey,
+          monthName: date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }),
+          komoditas: new Map()
+        });
+      }
+      
+      const monthData = monthlyData.get(monthKey);
+      if (!monthData.komoditas.has(komoditasName)) {
+        monthData.komoditas.set(komoditasName, {
+          nama_komoditas: komoditasName,
+          total_stock_awal: 0,
+          total_pengadaan: 0,
+          total_penyaluran: 0,
+          stock_akhir: 0
+        });
+      }
+      
+      const komoditasData = monthData.komoditas.get(komoditasName);
+      komoditasData.total_stock_awal += Number(t.stockAwal) || 0;
+      komoditasData.total_pengadaan += Number(t.pengadaan) || 0;
+      komoditasData.total_penyaluran += Number(t.penyaluran) || 0;
+      komoditasData.stock_akhir = komoditasData.total_stock_awal + komoditasData.total_pengadaan - komoditasData.total_penyaluran;
+    });
+
+    // Convert to array format
+    const result = Array.from(monthlyData.values()).map(monthData => ({
+      ...monthData,
+      komoditas: Array.from(monthData.komoditas.values())
+    }));
+
+    return result.sort((a, b) => b.month.localeCompare(a.month));
   }
 }

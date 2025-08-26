@@ -8,6 +8,7 @@ import Komoditas from '../../components/admin/stock-pangan/komoditas/Komoditas';
 import TransaksiStockPangan from './stock-pangan/TransaksiStockPangan';
 import ReportStockPangan from './stock-pangan/ReportStockPangan';
 
+
 // Daftar tab yang valid untuk dicocokkan dengan URL
 const validTabs = {
   'distributor': 'Distributor',

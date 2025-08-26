@@ -168,13 +168,16 @@ export class ReportStockPanganService {
         };
       }
       
-      const stockAkhir = transaksi.stockAwal + transaksi.pengadaan - transaksi.penyaluran;
+      const stockAwal = Number(transaksi.stockAwal) || 0;
+      const pengadaan = Number(transaksi.pengadaan) || 0;
+      const penyaluran = Number(transaksi.penyaluran) || 0;
+      const stockAkhir = stockAwal + pengadaan - penyaluran;
       
       const dataItem = {
         distributor: transaksi.distributor.nama_distributor,
-        stockAwal: transaksi.stockAwal,
-        pengadaan: transaksi.pengadaan,
-        penyaluran: transaksi.penyaluran,
+        stockAwal: stockAwal,
+        pengadaan: pengadaan,
+        penyaluran: penyaluran,
         stockAkhir: stockAkhir,
         satuan: satuan
       };
@@ -182,9 +185,9 @@ export class ReportStockPanganService {
       grouped[komoditasName].data.push(dataItem);
       
       // Update totals
-      grouped[komoditasName].totals.stockAwal += transaksi.stockAwal;
-      grouped[komoditasName].totals.pengadaan += transaksi.pengadaan;
-      grouped[komoditasName].totals.penyaluran += transaksi.penyaluran;
+      grouped[komoditasName].totals.stockAwal += stockAwal;
+      grouped[komoditasName].totals.pengadaan += pengadaan;
+      grouped[komoditasName].totals.penyaluran += penyaluran;
       grouped[komoditasName].totals.stockAkhir += stockAkhir;
     });
     
