@@ -34,7 +34,6 @@ export const buildApiUrl = (endpoint: string): string => {
   return `${API_CONFIG.BASE_URL}${endpoint}`;
 };
 
-
 // Development mode check
 export const isDevelopment = import.meta.env.DEV;
 
@@ -47,7 +46,7 @@ export const checkApiStatus = async (): Promise<boolean> => {
     } as any);
     return response.ok;
   } catch (error) {
-    console.warn('Backend API not available, using mock data');
+    console.warn('Backend API not available');
     return false;
   }
 };
