@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Building2, Package, CheckCircle, AlertTriangle, XCircle, DatabaseBackup, Car, Users, Fuel, Zap, Truck } from 'lucide-react';
+import { Building2, Package,  DatabaseBackup, Car, Users, Fuel, Zap, Truck } from 'lucide-react';
 import PriceChart from '../../components/PriceChart';
 import StockPanganChart from '../../components/StockPanganChart';
 
@@ -18,7 +18,7 @@ interface PriceHistoryItem {
 export default function DashboardPage() {
   // State untuk statistik
   const [marketCount, setMarketCount] = useState(0);
-  const [itemCount, setItemCount] = useState(0);
+  // const [itemCount, setItemCount] = useState(0);
   const [spbuCount, setSpbuCount] = useState(0);
   const [agenCount, setAgenCount] = useState(0);
   const [pangkalanLpgCount, setPangkalanLpgCount] = useState(0);
@@ -29,7 +29,7 @@ export default function DashboardPage() {
   
   // State baru untuk data grafik
   const [chartData, setChartData] = useState([]);
-  const [chartLines, setChartLines] = useState([]);
+  // const [chartLines, setChartLines] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
