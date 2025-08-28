@@ -34,8 +34,6 @@ const openGoogleMaps = (latitude?: number, longitude?: number) => {
 
 export default function Spbu() {
   const [spbuList, setSpbuList] = useState<Spbu[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -98,18 +96,18 @@ export default function Spbu() {
   };
 
   const fetchSpbu = async () => {
-    setLoading(true);
+    // setLoading(true);
     const token = localStorage.getItem('accessToken');
-    if (!token) { setError("Autentikasi gagal."); setLoading(false); return; }
+    if (!token) { /* setError("Autentikasi gagal."); setLoading(false); */ return; }
     try {
       const response = await axios.get(`${API_BASE_URL}/spbu`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSpbuList(response.data);
     } catch (err) {
-      setError("Gagal mengambil data SPBU.");
+      // setError("Gagal mengambil data SPBU.");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

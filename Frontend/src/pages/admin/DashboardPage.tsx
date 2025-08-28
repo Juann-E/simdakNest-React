@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Building2, Package, CheckCircle, AlertTriangle, XCircle, DatabaseBackup, Car, Users, Fuel, Zap, Truck } from 'lucide-react';
+import { Building2, Package, DatabaseBackup, Car, Users, Fuel, Zap, Truck } from 'lucide-react';
 import PriceChart from '../../components/PriceChart';
 import StockPanganChart from '../../components/StockPanganChart';
 
@@ -18,7 +18,7 @@ interface PriceHistoryItem {
 export default function DashboardPage() {
   // State untuk statistik
   const [marketCount, setMarketCount] = useState(0);
-  const [itemCount, setItemCount] = useState(0);
+  // const [itemCount, setItemCount] = useState(0); // Unused for now
   const [spbuCount, setSpbuCount] = useState(0);
   const [agenCount, setAgenCount] = useState(0);
   const [pangkalanLpgCount, setPangkalanLpgCount] = useState(0);
@@ -27,9 +27,9 @@ export default function DashboardPage() {
   const [komoditasKepokmasCount, setKomoditasKepokmasCount] = useState(0);
   const [komoditasStockPanganCount, setKomoditasStockPanganCount] = useState(0);
   
-  // State baru untuk data grafik
-  const [chartData, setChartData] = useState([]);
-  const [chartLines, setChartLines] = useState([]);
+  // State baru untuk data grafik (unused for now)
+  // const [chartData, setChartData] = useState<any[]>([]);
+  // const [chartLines, setChartLines] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -82,8 +82,8 @@ export default function DashboardPage() {
           }
         });
         
-        const formattedChartData = Object.values(groupedByDate);
-        setChartData(formattedChartData);
+        // const formattedChartData = Object.values(groupedByDate);
+        // setChartData(formattedChartData); // Commented out since chartData is unused
       } catch (error) {
         console.error("Gagal mengambil data dashboard:", error);
       } finally {
@@ -209,7 +209,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         <div className="lg:col-span-2">
-          <PriceChart data={chartData} lines={chartLines} />
+          <PriceChart />
         </div>
       </div>
 

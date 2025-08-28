@@ -17,7 +17,7 @@ interface Komoditas {
   satuan: Unit;
 }
 
-interface FormData {
+interface KomoditasFormData {
   komoditas: string;
   keterangan: string;
   id_satuan: string;
@@ -36,7 +36,7 @@ const Komoditas = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingKomoditas, setEditingKomoditas] = useState<Komoditas | null>(null);
   const [komoditasToDelete, setKomoditasToDelete] = useState<Komoditas | null>(null);
-  const [formData, setFormData] = useState({ komoditas: '', keterangan: '', id_satuan: '' });
+  const [formData, setFormData] = useState<KomoditasFormData>({ komoditas: '', keterangan: '', id_satuan: '' });
 
   // Logika untuk memfilter dan memotong data untuk halaman saat ini
   const filteredKomoditas = useMemo(() =>

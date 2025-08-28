@@ -83,14 +83,15 @@ export default function StockPanganDetailPage() {
     }
   };
 
-  const getAvailableYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let year = currentYear - 5; year <= currentYear + 1; year++) {
-      years.push(year);
-    }
-    return years;
-  };
+  // Unused function - commented out
+  // const getAvailableYears = () => {
+  //   const currentYear = new Date().getFullYear();
+  //   const years = [];
+  //   for (let year = currentYear - 5; year <= currentYear + 1; year++) {
+  //     years.push(year);
+  //   }
+  //   return years;
+  // };
 
   const getCurrentMonthData = () => {
     const monthKey = `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`;
