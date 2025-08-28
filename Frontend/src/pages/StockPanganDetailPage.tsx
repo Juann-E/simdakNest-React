@@ -83,7 +83,10 @@ export default function StockPanganDetailPage() {
     }
   };
 
+<<<<<<< HEAD
   // Unused function - commented out
+=======
+>>>>>>> 616512b94eb84a8c8a227785e0ccbe42b15fdb4d
   // const getAvailableYears = () => {
   //   const currentYear = new Date().getFullYear();
   //   const years = [];
