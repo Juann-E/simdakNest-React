@@ -16,18 +16,20 @@ export default function LoginPage() {
 
     try {
       // Menggunakan detail API yang Anda berikan
-      const response = await axios.post('http://localhost:3000/auth/login', {
-        username: username,
-        password: password,
-      });
-
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          username,
+          password,
+        }
+      );
       // Mengambil 'access_token' sesuai respons backend
       const { access_token } = response.data;
 
       if (access_token) {
         localStorage.setItem('accessToken', access_token);
         // Arahkan ke halaman utama/dashboard setelah login
-        navigate('/admin/dashboard'); 
+        navigate('/admin/dashboard');
       } else {
         setError("Username atau Password Salah, Coba lagi.");
       }
@@ -48,13 +50,13 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50">
       <div className="w-full max-w-sm p-8 space-y-8 bg-white rounded-2xl shadow-xl">
         <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-2xl font-bold text-blue-600">SIMDAG</h1>
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-700">Login Admin</h2>
+            <h1 className="text-2xl font-bold text-blue-600">SIMDAG</h1>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-700">Login Admin</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
@@ -94,10 +96,10 @@ export default function LoginPage() {
           </div>
         </form>
         <div className="text-center">
-            <Link to="/" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 hover:underline">
-                <ArrowLeft size={14} />
-                Kembali ke Beranda
-            </Link>
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 hover:underline">
+            <ArrowLeft size={14} />
+            Kembali ke Beranda
+          </Link>
         </div>
       </div>
     </div>
