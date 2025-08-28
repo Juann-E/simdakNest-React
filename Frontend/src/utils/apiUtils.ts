@@ -1,5 +1,5 @@
 import axios, { type AxiosResponse } from 'axios';
-import { API_CONFIG, isDevelopment } from '../config/api';
+import { API_CONFIG } from '../config/api';
 
 // Create axios instance with default config
 const apiClient = axios.create({
