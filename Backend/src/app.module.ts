@@ -50,14 +50,18 @@ import { PublicModule } from './common/public/public.module';
 
     // Database
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
+      ssl: {
+        rejectUnauthorized: false
+      },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false
+      synchronize: true, // Set to false in production
+      logging: true
     }),
 
     // upload gambar

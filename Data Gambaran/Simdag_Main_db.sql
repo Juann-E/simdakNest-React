@@ -1,130 +1,194 @@
--- Buat database
-CREATE DATABASE IF NOT EXISTS Simdag_Main_db;
-USE Simdag_Main_db;
-
--- Tabel users
-CREATE TABLE users (
-    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin','operator') DEFAULT 'operator',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- agen
+CREATE TABLE `agen` (
+  `id_agen` int(11) NOT NULL,
+  `nama_usaha` varchar(100) NOT NULL,
+  `id_kecamatan` int(11) NOT NULL,
+  `id_kelurahan` int(11) NOT NULL,
+  `alamat` text NOT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `telepon` varchar(50) DEFAULT NULL,
+  `penanggung_jawab` varchar(100) DEFAULT NULL,
+  `nomor_hp_penanggung_jawab` varchar(20) DEFAULT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel nama_pasar
-CREATE TABLE nama_pasar (
-    id_pasar INT AUTO_INCREMENT PRIMARY KEY,
-    nama_pasar VARCHAR(100) NOT NULL,
-    alamat TEXT,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    gambar VARCHAR(255) NULL,
-    latitude DECIMAL(10,7) NULL,
-    longitude DECIMAL(10,7) NULL
-);
+-- barang_pasar_grid
+CREATE TABLE `barang_pasar_grid` (
+  `id_barang_pasar` int(11) NOT NULL,
+  `id_pasar` int(11) DEFAULT NULL,
+  `id_barang` int(11) DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `time_stamp` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel satuan_barang
-CREATE TABLE satuan_barang (
-    id_satuan INT AUTO_INCREMENT PRIMARY KEY,
-    satuan_barang VARCHAR(50) NOT NULL,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- distributor
+CREATE TABLE `distributor` (
+  `id_distributor` int(11) NOT NULL,
+  `nama_distributor` varchar(100) NOT NULL,
+  `id_kecamatan` int(11) NOT NULL,
+  `id_kelurahan` int(11) NOT NULL,
+  `alamat` text NOT NULL,
+  `koordinat` varchar(255) DEFAULT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `time_stamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabel nama_barang
-CREATE TABLE nama_barang (
-    id_barang INT AUTO_INCREMENT PRIMARY KEY,
-    nama_barang VARCHAR(100) NOT NULL,
-    id_satuan INT NOT NULL,
-    keterangan TEXT,
-    gambar VARCHAR(255), -- <--- kolom baru
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_satuan) REFERENCES satuan_barang(id_satuan)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-);
+-- dokumen_spbu
+CREATE TABLE `dokumen_spbu` (
+  `id_dokumenSPBU` int(11) NOT NULL,
+  `id_spbu` int(11) NOT NULL,
+  `id_ref_dSPBU` int(11) NOT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `file_ext` varchar(255) DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel barang_pasar_grid
-CREATE TABLE barang_pasar_grid (
-    id_barang_pasar INT AUTO_INCREMENT PRIMARY KEY,
-    id_pasar INT NOT NULL,
-    id_barang INT NOT NULL,
-    keterangan TEXT,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_pasar) REFERENCES nama_pasar(id_pasar)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    FOREIGN KEY (id_barang) REFERENCES nama_barang(id_barang)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+-- harga_barang_pasar
+CREATE TABLE `harga_barang_pasar` (
+  `id_harga` int(11) NOT NULL,
+  `id_barang_pasar` int(11) NOT NULL,
+  `harga` decimal(15,2) NOT NULL,
+  `keterangan` text DEFAULT NULL,
+  `time_stamp` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tanggal_harga` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- kecamatan
+CREATE TABLE `kecamatan` (
+  `id_kecamatan` int(11) NOT NULL,
+  `nama_kecamatan` varchar(100) NOT NULL,
+  `keterangan` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel harga_barang_pasar
-CREATE TABLE harga_barang_pasar (
-    id_harga INT AUTO_INCREMENT PRIMARY KEY,
-    id_barang_pasar INT NOT NULL,
-    harga DECIMAL(15,2) NOT NULL,
-    keterangan TEXT,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    tanggal_harga DATE NOT NULL,
-    FOREIGN KEY (id_barang_pasar) REFERENCES barang_pasar_grid(id_barang_pasar)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-
--- Optional: View untuk menghitung persentase perubahan harga H-1 vs terbaru
-CREATE VIEW view_perubahan_harga AS
-SELECT 
-    h1.id_barang_pasar,
-    bpg.id_pasar,
-    np.nama_pasar,
-    nb.nama_barang,
-    h1.harga AS harga_terbaru,
-    h2.harga AS harga_h_1,
-    ROUND(((h1.harga - h2.harga) / h2.harga) * 100, 2) AS persen_perubahan
-FROM harga_barang_pasar h1
-JOIN harga_barang_pasar h2 
-    ON h1.id_barang_pasar = h2.id_barang_pasar
-    AND DATE(h2.time_stamp) = DATE(h1.time_stamp) - INTERVAL 1 DAY
-JOIN barang_pasar_grid bpg ON h1.id_barang_pasar = bpg.id_barang_pasar
-JOIN nama_pasar np ON bpg.id_pasar = np.id_pasar
-JOIN nama_barang nb ON bpg.id_barang = nb.id_barang;
+-- kelurahan
+CREATE TABLE `kelurahan` (
+  `id_kelurahan` int(11) NOT NULL,
+  `nama_kelurahan` varchar(100) NOT NULL,
+  `keterangan` text DEFAULT NULL,
+  `id_kecamatan` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+-- komoditas_stock_pangan
+CREATE TABLE `komoditas_stock_pangan` (
+  `id_komoditas` int(11) NOT NULL,
+  `komoditas` varchar(100) NOT NULL,
+  `satuan` varchar(50) NOT NULL,
+  `keterangan` text DEFAULT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `time_stamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ======================== SPBU LPG================================================
+-- nama_barang
+CREATE TABLE `nama_barang` (
+  `id_barang` int(11) NOT NULL,
+  `nama_barang` varchar(100) NOT NULL,
+  `id_satuan` int(11) DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `time_stamp` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Table kecamatan
-CREATE TABLE kecamatan (
-    id_kecamatan INT AUTO_INCREMENT PRIMARY KEY,
-    nama_kecamatan VARCHAR(100) NOT NULL,
-    keterangan TEXT
-);
+-- nama_pasar
+CREATE TABLE `nama_pasar` (
+  `id_pasar` int(11) NOT NULL,
+  `nama_pasar` varchar(100) NOT NULL,
+  `alamat` text DEFAULT NULL,
+  `time_stamp` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `gambar` varchar(255) DEFAULT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabel Kelurahan 
-CREATE TABLE kelurahan (
-    id_kelurahan INT AUTO_INCREMENT PRIMARY KEY,
-    id_kecamatan INT NOT NULL,
-    nama_kelurahan VARCHAR(100) NOT NULL,
-    keterangan TEXT,
-    CONSTRAINT fk_kelurahan_kecamatan
-      FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan)
-      ON DELETE CASCADE
-);
+-- pangkalan_lpg
+CREATE TABLE `pangkalan_lpg` (
+  `id_pangkalan_lpg` int(11) NOT NULL,
+  `nama_usaha` varchar(100) NOT NULL,
+  `id_kecamatan` int(11) NOT NULL,
+  `id_kelurahan` int(11) NOT NULL,
+  `alamat` text NOT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `telepon` varchar(50) DEFAULT NULL,
+  `penanggung_jawab` varchar(100) DEFAULT NULL,
+  `nomor_hp_penanggung_jawab` varchar(20) DEFAULT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- table spbu
-CREATE TABLE spbu (
-    id_spbu INT AUTO_INCREMENT PRIMARY KEY,
-    no_spbu VARCHAR(50) NOT NULL,
-    id_kecamatan INT NOT NULL,
-    id_kelurahan INT NOT NULL,
-    alamat TEXT NOT NULL,
-    latitude DECIMAL(10,7),
-    longitude DECIMAL(10,7),
-    telepon VARCHAR(50),
-    penanggung_jawab VARCHAR(100),
-    FOREIGN KEY (id_kecamatan) REFERENCES kecamatan(id_kecamatan),
-    FOREIGN KEY (id_kelurahan) REFERENCES kelurahan(id_kelurahan)
-);
+-- satuan_barang
+CREATE TABLE `satuan_barang` (
+  `id_satuan` int(11) NOT NULL,
+  `satuan_barang` varchar(50) NOT NULL,
+  `time_stamp` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- satuan_barang_stock_pangan
+CREATE TABLE `satuan_barang_stock_pangan` (
+  `id_satuan` int(11) NOT NULL,
+  `satuan_barang` varchar(50) NOT NULL,
+  `time_stamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- spbe
+CREATE TABLE `spbe` (
+  `id_spbe` int(11) NOT NULL,
+  `id_kecamatan` int(11) NOT NULL,
+  `id_kelurahan` int(11) NOT NULL,
+  `alamat` text NOT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `telepon` varchar(50) DEFAULT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif',
+  `nama_usaha` varchar(100) NOT NULL,
+  `penanggung_jawab` varchar(100) DEFAULT NULL,
+  `nomor_hp_penanggung_jawab` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- spbu
+CREATE TABLE `spbu` (
+  `id_spbu` int(11) NOT NULL,
+  `no_spbu` varchar(50) NOT NULL,
+  `id_kecamatan` int(11) NOT NULL,
+  `id_kelurahan` int(11) NOT NULL,
+  `alamat` text NOT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `telepon` varchar(50) DEFAULT NULL,
+  `penanggung_jawab` varchar(100) DEFAULT NULL,
+  `nomor_hp_penanggung_jawab` varchar(20) DEFAULT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif',
+  `nama_usaha` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- transaksi_stock_pangan
+CREATE TABLE `transaksi_stock_pangan` (
+  `id_transaksi` int(11) NOT NULL,
+  `tahun` int(4) NOT NULL,
+  `bulan` int(2) NOT NULL,
+  `id_distributor` int(11) NOT NULL,
+  `id_komoditas` int(11) NOT NULL,
+  `stock_awal` decimal(10,2) DEFAULT 0.00,
+  `pengadaan` decimal(10,2) DEFAULT 0.00,
+  `penyaluran` decimal(10,2) DEFAULT 0.00,
+  `keterangan` text DEFAULT NULL,
+  `time_stamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- users
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('admin','operator') NOT NULL DEFAULT 'operator',
+  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- view_perubahan_harga
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_perubahan_harga`  AS SELECT `h1`.`id_barang_pasar` AS `id_barang_pasar`, `bpg`.`id_pasar` AS `id_pasar`, `np`.`nama_pasar` AS `nama_pasar`, `nb`.`nama_barang` AS `nama_barang`, `h1`.`harga` AS `harga_terbaru`, `h2`.`harga` AS `harga_h_1`, round((`h1`.`harga` - `h2`.`harga`) / `h2`.`harga` * 100,2) AS `persen_perubahan` FROM ((((`harga_barang_pasar` `h1` join `harga_barang_pasar` `h2` on(`h1`.`id_barang_pasar` = `h2`.`id_barang_pasar` and cast(`h2`.`time_stamp` as date) = cast(`h1`.`time_stamp` as date) - interval 1 day)) join `barang_pasar_grid` `bpg` on(`h1`.`id_barang_pasar` = `bpg`.`id_barang_pasar`)) join `nama_pasar` `np` on(`bpg`.`id_pasar` = `np`.`id_pasar`)) join `nama_barang` `nb` on(`bpg`.`id_barang` = `nb`.`id_barang`)) ;

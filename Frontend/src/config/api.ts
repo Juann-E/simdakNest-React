@@ -148,3 +148,27 @@ export const checkApiStatus = async (): Promise<boolean> => {
     return false;
   }
 };
+
+// Opsi 3: Test Langsung dari Frontend
+
+// Karena frontend sudah deploy di Netlify, test melalui aplikasi web:
+
+// 1. **Buka**: https://simdag-salatiga-deploy.netlify.app
+// 2. **Test fitur**:
+//    - Login/Authentication
+//    - Data Kecamatan
+//    - Data Pasar
+//    - Stock Pangan
+//    - Dashboard
+
+// ## 🎯 **Rekomendasi Workflow:**
+
+// ### **Step 1: Update Frontend Config**
+
+// Update URL backend di frontend untuk point ke backend yang sudah deploy:
+// ```typescript
+// // Production config
+// const API_BASE_URL = process.env.NODE_ENV === 'production' 
+//   ? 'https://your-backend-url.railway.app/api'
+//   : 'http://localhost:3000/api';
+// ```
