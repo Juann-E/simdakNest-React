@@ -34,14 +34,14 @@ export default function Header() {
               <span className="hidden sm:inline">Login Admin</span>
               <span className="sm:hidden">Admin</span>
             </Link>
-            <a
+            <Link
+              to="/tentang"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-all duration-200 h-9 rounded-md px-3 text-xs sm:text-sm border border-gray-200 bg-white hover:bg-gray-100"
-              href="#"
             >
               <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Training</span>
+              <span className="hidden sm:inline">Tentang</span>
               <span className="sm:hidden">Info</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import StockPanganPage from './pages/admin/StockPanganPage';
 import SettingsPage from './pages/admin/SettingsPage';
 import GridDetailPage from './components/admin/kepokmas/GridDetailPage';
 import HargaGridDetailPage from './components/admin/kepokmas/harga_barang_grid/HargaGridDetailPage';
+import TentangPage from './pages/TentangPage';
 
 // ## PATH IMPOR YANG SUDAH DIPERBAIKI ##
 import InputHargaPage from './components/admin/kepokmas/harga_barang_grid/InputHargaPage';
@@ -64,6 +65,7 @@ function App() {
         <Route path="/" element={<MarketListPage />} />
         <Route path="/market/:marketId" element={<MarketDetailPage />} />
         <Route path="/distributor/:distributorId" element={<StockPanganDetailPage />} />
+        <Route path="/tentang" element={<TentangPage />} />
       </Route>
 
       {/* Rute Admin yang Terproteksi */}
